@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Gilded Spoon by Flour Shoppe Studios - Artisanal Cakes & Curiosities</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700&family=Raleway:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        /* Custom styles to achieve the desired aesthetic */
+        body {
+            font-family: 'Raleway', sans-serif;
+            background-color: #FDF8F5; /* A very light, warm pink/beige */
+            color: #4A3F35; /* A dark, warm brown for text */
+        }
+        h1, h2, h3, h4, .font-serif {
+            font-family: 'Playfair Display', serif;
+        }
+        .text-accent {
+            color: #A97C50; /* A soft, gilded gold/bronze color */
+        }
+        .bg-accent {
+            background-color: #A97C50;
+        }
+        .border-accent {
+            border-color: #A97C50;
+        }
+        .bg-secondary {
+            background-color: #EFEAE6; /* A complementary soft beige */
+        }
+        .btn {
+            @apply inline-block px-8 py-3 text-center font-semibold rounded-lg transition-transform duration-300 ease-in-out;
+        }
+        .btn-primary {
+            @apply bg-accent text-white hover:bg-opacity-90 shadow-lg hover:scale-105;
+        }
+        .btn-secondary {
+            @apply bg-transparent border-2 border-accent text-accent hover:bg-accent hover:text-white;
+        }
+        .section-title {
+            @apply text-4xl md:text-5xl font-bold text-center mb-4;
+        }
+        .section-subtitle {
+            @apply text-lg text-center text-gray-600 mb-12 max-w-2xl mx-auto;
+        }
+        .form-input {
+            @apply w-full p-3 bg-white rounded-lg border border-stone-300 focus:outline-none focus:ring-2 focus:ring-accent/50 transition-shadow;
+        }
+        /* Cart styles */
+        .cart-icon-container {
+            position: relative;
+        }
+        .cart-item-count {
+            @apply absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center;
+        }
+        .cart-modal {
+            @apply fixed inset-0 bg-black/50 z-50 flex justify-end;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0s 0.3s, opacity 0.3s;
+        }
+        .cart-modal.is-open {
+            visibility: visible;
+            opacity: 1;
+            transition: visibility 0s, opacity 0.3s;
+        }
+        .cart-modal-content {
+            @apply bg-white h-full w-full max-w-md shadow-2xl flex flex-col transform translate-x-full;
+            transition: transform 0.3s ease-in-out;
+        }
+        .cart-modal.is-open .cart-modal-content {
+            transform: translateX(0);
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Header -->
+    <header class="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="text-center">
+                <span class="text-3xl font-serif font-bold text-accent block">The Gilded Spoon</span>
+                <span class="text-sm text-gray-600 block -mt-1">by Flour Shoppe Studios</span>
+            </a>
+            <div class="hidden md:flex items-center space-x-6">
+                <a href="#bakery" class="text-gray-700 hover:text-accent transition duration-300">Bakery</a>
+                <a href="#kits" class="text-gray-700 hover:text-accent transition duration-300">DIY Kits</a>
+                <a href="#experiences" class="text-gray-700 hover:text-accent transition duration-300">Experiences</a>
+                <a href="#goods" class="text-gray-700 hover:text-accent transition duration-300">Goods</a>
+                <a href="#booking" class="text-gray-700 hover:text-accent transition duration-300">Book Now</a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button class="cart-icon-container focus:outline-none" id="cart-icon">
+                    <svg class="w-7 h-7 text-gray-700 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    <span id="cart-item-count" class="cart-item-count hidden pointer-events-none">0</span>
+                </button>
+                <button class="md:hidden focus:outline-none" id="mobile-menu-button">
+                    <svg class="w-7 h-7 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+        </nav>
+        <!-- Mobile Menu -->
+        <div class="hidden md:hidden" id="mobile-menu">
+            <a href="#bakery" class="block py-2 px-4 text-sm hover:bg-secondary">Bakery</a>
+            <a href="#kits" class="block py-2 px-4 text-sm hover:bg-secondary">DIY Kits</a>
+            <a href="#experiences" class="block py-2 px-4 text-sm hover:bg-secondary">Experiences</a>
+            <a href="#goods" class="block py-2 px-4 text-sm hover:bg-secondary">Goods</a>
+            <a href="#booking" class="block py-3 px-4 text-sm bg-secondary text-accent font-semibold">Book Now</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section -->
+        <section class="relative py-24 md:py-40 flex items-center justify-center text-center bg-secondary">
+             <div class="absolute inset-0 bg-cover bg-center opacity-20" style="background-image: url('https://placehold.co/1920x1080/FDF8F5/4A3F35?text=Vintage+Floral+Pattern');"></div>
+            <div class="relative container mx-auto px-6">
+                <h1 class="text-5xl md:text-7xl font-bold leading-tight">Where Every Cake Tells a Story</h1>
+                <p class="mt-6 text-xl md:text-2xl text-gray-700 max-w-3xl mx-auto">Artisanal cakes, creative kits, and charming goods, crafted with passion and a touch of whimsy.</p>
+                <div class="mt-10">
+                    <a href="#kits" class="btn btn-primary">Discover Our Kits</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bakery Offerings Section -->
+        <section id="bakery" class="py-20">
+            <div class="container mx-auto px-6">
+                <h2 class="section-title">From Our Bakery</h2>
+                <p class="section-subtitle">Freshly baked delights, made from scratch with the finest ingredients. Perfect for a simple treat or a grand celebration.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                    <!-- Cake by the Slice -->
+                    <div class="bg-white p-8 rounded-xl shadow-lg text-center flex flex-col">
+                        <img src="https://placehold.co/400x300/EFEAE6/A97C50?text=Slice+of+Cake" alt="A slice of layered cake" class="w-full h-48 object-cover rounded-lg mb-6">
+                        <h3 class="text-2xl font-serif font-semibold mb-2">Cake by the Slice</h3>
+                        <p class="text-accent font-bold text-xl mb-4">$8</p>
+                        <p class="text-gray-600 mb-6 flex-grow">A generous slice of our signature, multi-layered cake. Flavors rotate weekly, always offering something new and delicious.</p>
+                        <button class="btn btn-secondary mt-auto add-to-cart-btn" data-name="Cake by the Slice" data-price="8.00">Add to Cart</button>
+                    </div>
+                    <!-- Cake Pucks -->
+                    <div class="bg-white p-8 rounded-xl shadow-lg text-center flex flex-col">
+                        <img src="https://placehold.co/400x300/EFEAE6/A97C50?text=Cake+Pucks" alt="Decorated cake pucks" class="w-full h-48 object-cover rounded-lg mb-6">
+                        <h3 class="text-2xl font-serif font-semibold mb-2">Cake Pucks</h3>
+                        <p class="text-accent font-bold text-xl mb-4">$4 each or 3 for $10</p>
+                        <p class="text-gray-600 mb-6 flex-grow">A modern take on a cake pop. A dense, puck-shaped treat dipped in chocolate and beautifully decorated.</p>
+                        <button class="btn btn-secondary mt-auto add-to-cart-btn" data-name="Cake Puck" data-price="4.00">Add to Cart</button>
+                    </div>
+                    <!-- Custom Edible Images -->
+                    <div class="bg-white p-8 rounded-xl shadow-lg text-center flex flex-col">
+                        <img src="https://placehold.co/400x300/EFEAE6/A97C50?text=Edible+Image" alt="An edible image sheet for cakes" class="w-full h-48 object-cover rounded-lg mb-6">
+                        <h3 class="text-2xl font-serif font-semibold mb-2">Custom Edible Images</h3>
+                        <p class="text-accent font-bold text-xl mb-4">$15</p>
+                        <p class="text-gray-600 mb-6 flex-grow">Print your photos or designs onto an 8.5" x 11" icing sheet for a truly personal touch on your celebration cakes.</p>
+                        <button class="btn btn-secondary mt-auto add-to-cart-btn" data-name="Custom Edible Image" data-price="15.00">Add to Cart</button>
+                    </div>
+                </div>
+                <!-- Custom Cakes Callout -->
+                <div class="mt-20 bg-white rounded-xl shadow-lg overflow-hidden flex flex-col md:flex-row items-center">
+                    <img src="https://placehold.co/600x400/D1C4B7/4A3F35?text=Custom+Celebration+Cake" alt="A beautiful custom celebration cake" class="w-full md:w-1/2 h-64 md:h-auto object-cover">
+                    <div class="p-10 text-center md:text-left">
+                        <h3 class="text-3xl font-serif font-bold mb-3">Custom Celebration Cakes</h3>
+                        <p class="text-gray-600 leading-relaxed mb-6">For birthdays, weddings, and any moment worth celebrating. Let's work together to design a bespoke cake that's as unique as your event. Available by quote only.</p>
+                        <a href="#booking" class="btn btn-secondary">Request a Quote</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- DIY Kits Section -->
+        <section id="kits" class="py-20 bg-secondary">
+            <div class="container mx-auto px-6">
+                <h2 class="section-title">DIY Cake Decorating Kits</h2>
+                <p class="section-subtitle">Each set comes with everything you need: a 4-inch mini cake, themed frostings, a special sprinkle mix, a custom-designed apron, and an instruction card.</p>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                    <!-- Express Your Mood Kit -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col">
+                        <img src="https://placehold.co/600x400/fca5a5/4A3F35?text=Express+Your+Mood" alt="Vibrant cake decorating kit" class="w-full h-56 object-cover">
+                        <div class="p-8 flex-grow flex flex-col">
+                            <h3 class="text-2xl font-serif font-bold mb-2">"Express Your Mood" Kit</h3>
+                            <p class="text-accent font-bold text-2xl mb-4">$74</p>
+                            <p class="text-gray-600 mb-6 flex-grow">This kit is all about color and personality. It comes with a vibrant palette of frostings and bold decorations, perfect for creating a cake that's uniquely you.</p>
+                            <button class="btn btn-secondary mt-auto add-to-cart-btn" data-name="Express Your Mood Kit" data-price="74.00">Add to Cart</button>
+                        </div>
+                    </div>
+                    <!-- Whispers of Wonderland Kit -->
+                    <div class="bg-white rounded-xl shadow-2xl overflow-hidden flex flex-col transform lg:scale-105 border-4 border-accent">
+                         <img src="https://placehold.co/600x400/a5b4fc/4A3F35?text=Whispers+of+Wonderland" alt="Whimsical cake decorating kit" class="w-full h-56 object-cover">
+                        <div class="p-8 flex-grow flex flex-col">
+                            <h3 class="text-2xl font-serif font-bold mb-2">"Whispers of Wonderland" Kit</h3>
+                            <p class="text-accent font-bold text-2xl mb-4">$95</p>
+                            <p class="text-gray-600 mb-6 flex-grow">Create a little magic with this whimsical kit. It features soft pastel frostings, edible glitter, and other enchanting decorations for a beautiful, storybook-style cake.</p>
+                            <button class="btn btn-primary mt-auto add-to-cart-btn" data-name="Whispers of Wonderland Kit" data-price="95.00">Add to Cart</button>
+                        </div>
+                    </div>
+                    <!-- Craft Your Own Tale Kit -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col">
+                         <img src="https://placehold.co/600x400/fde047/4A3F35?text=Craft+Your+Own+Tale" alt="Literary themed cake decorating kit" class="w-full h-56 object-cover">
+                        <div class="p-8 flex-grow flex flex-col">
+                            <h3 class="text-2xl font-serif font-bold mb-2">"Craft Your Own Tale" Kit</h3>
+                            <p class="text-accent font-bold text-2xl mb-4">$120</p>
+                            <p class="text-gray-600 mb-6 flex-grow">Our most detailed kit, for those who love storytelling. It includes specialty tools, intricate edible decorations, and literary-inspired touches.</p>
+                            <button class="btn btn-secondary mt-auto add-to-cart-btn" data-name="Craft Your Own Tale Kit" data-price="120.00">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center mt-12 bg-white/50 border-2 border-dashed border-accent/50 rounded-lg p-6 max-w-2xl mx-auto">
+                    <h4 class="font-serif text-xl font-bold text-accent">Special Offer!</h4>
+                    <p class="text-gray-700 mt-2">Planning a party or a creative get-together? Get 15% off when you purchase any two of our DIY kits.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Experiences Section -->
+        <section id="experiences" class="py-20">
+            <div class="container mx-auto px-6">
+                <h2 class="section-title">Guided Experiences & Group Events</h2>
+                <p class="section-subtitle">Bring a touch of creative magic to your next gathering. We offer a range of decorating experiences perfect for any occasion.</p>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                    <!-- In-Person Events -->
+                    <div class="bg-white p-8 rounded-xl shadow-lg flex flex-col items-center text-center">
+                        <img src="https://placehold.co/500x350/EFEAE6/A97C50?text=Guided+Event" alt="People decorating cakes at an event" class="w-full h-56 object-cover rounded-lg mb-6">
+                        <h3 class="text-3xl font-serif font-bold mb-3">In-Person Guided Experiences</h3>
+                        <p class="text-gray-600 leading-relaxed mb-6 flex-grow">Host a memorable event! We bring our themed cake decorating experiences to you. Perfect for corporate events, bridal showers, girls' nights, and private parties. We handle the setup, guidance, and cleanup.</p>
+                        <a href="#booking" class="btn btn-primary mt-auto">Book Your Event</a>
+                    </div>
+                    <!-- Virtual & Large Group Kits -->
+                    <div class="bg-white p-8 rounded-xl shadow-lg flex flex-col items-center text-center">
+                        <img src="https://placehold.co/500x350/EFEAE6/A97C50?text=Virtual+Kit" alt="A virtual kit with tools and recipes" class="w-full h-56 object-cover rounded-lg mb-6">
+                        <h3 class="text-3xl font-serif font-bold mb-3">Virtual & Large Group Kits</h3>
+                        <p class="text-gray-600 leading-relaxed mb-4">
+                            <strong>Virtual Experience:</strong> Get a kit shipped with all the tools, accessories, and recipes you need. As a Texas Cottage Baker, we can't ship food, so you'll bake the cake and make the frosting with our guided recipes!
+                        </p>
+                        <p class="text-gray-600 leading-relaxed mb-6 flex-grow">
+                            <strong>Large Gatherings (10+):</strong> Order our classic DIY kits in bulk for your large group. Contact us for special pricing.
+                        </p>
+                        <a href="#booking" class="btn btn-secondary mt-auto">Inquire About Kits</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Merchandise & Literary Goods Section -->
+        <section id="goods" class="py-20 bg-secondary">
+            <div class="container mx-auto px-6">
+                <h2 class="section-title">Merchandise & Literary Goods</h2>
+                <p class="section-subtitle">A curated collection of charming goods for the creative soul and cake lover alike.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                    <!-- T-Shirts -->
+                    <div class="bg-white p-8 rounded-xl shadow-lg text-center flex flex-col">
+                        <img src="https://placehold.co/400x300/EFEAE6/A97C50?text=Branded+T-Shirt" alt="A branded t-shirt" class="w-full h-48 object-cover rounded-lg mb-6">
+                        <h3 class="text-2xl font-serif font-semibold mb-2">Branded T-Shirts</h3>
+                        <p class="text-accent font-bold text-xl mb-4">$25</p>
+                        <p class="text-gray-600 mb-6 flex-grow">High-quality, soft cotton t-shirts featuring our logo or a fun, cake-themed design. Show your support in style!</p>
+                         <button class="btn btn-secondary mt-auto add-to-cart-btn" data-name="Branded T-Shirt" data-price="25.00">Add to Cart</button>
+                    </div>
+                    <!-- Artisan Postcards -->
+                    <div class="bg-white p-8 rounded-xl shadow-lg text-center flex flex-col">
+                        <img src="https://placehold.co/400x300/EFEAE6/A97C50?text=Artisan+Postcards" alt="A set of artisan postcards" class="w-full h-48 object-cover rounded-lg mb-6">
+                        <h3 class="text-2xl font-serif font-semibold mb-2">Artisan Postcards (Set of 3)</h3>
+                        <p class="text-accent font-bold text-xl mb-4">$10</p>
+                        <p class="text-gray-600 mb-6 flex-grow">Beautifully designed postcards with illustrations of our most popular cakes and charming bakery artwork.</p>
+                         <button class="btn btn-secondary mt-auto add-to-cart-btn" data-name="Artisan Postcard Set" data-price="10.00">Add to Cart</button>
+                    </div>
+                    <!-- Custom-Cover Journals -->
+                    <div class="bg-white p-8 rounded-xl shadow-lg text-center flex flex-col">
+                        <img src="https://placehold.co/400x300/EFEAE6/A97C50?text=Custom+Journal" alt="A journal with a custom cover" class="w-full h-48 object-cover rounded-lg mb-6">
+                        <h3 class="text-2xl font-serif font-semibold mb-2">Custom-Cover Journals</h3>
+                        <p class="text-accent font-bold text-xl mb-4">$18</p>
+                        <p class="text-gray-600 mb-6 flex-grow">Lined journals with unique, literary-inspired cover art that complements our creative, whimsical spirit.</p>
+                         <button class="btn btn-secondary mt-auto add-to-cart-btn" data-name="Custom-Cover Journal" data-price="18.00">Add to Cart</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Booking Section -->
+        <section id="booking" class="py-20">
+            <div class="container mx-auto px-6">
+                <h2 class="section-title">Book an Experience or Request a Quote</h2>
+                <p class="section-subtitle">We'd love to be a part of your celebration. Please fill out the form below, and we'll get back to you shortly to confirm details and availability.</p>
+                <div class="max-w-3xl mx-auto bg-white p-8 md:p-12 rounded-xl shadow-2xl">
+                    <form action="#" method="POST" onsubmit="return false;">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <label for="name" class="block text-gray-700 font-semibold mb-2">Full Name</label>
+                                <input type="text" id="name" name="name" class="form-input" required>
+                            </div>
+                            <div>
+                                <label for="email" class="block text-gray-700 font-semibold mb-2">Email Address</label>
+                                <input type="email" id="email" name="email" class="form-input" required>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <label for="inquiry_type" class="block text-gray-700 font-semibold mb-2">I'm Interested In...</label>
+                                <select id="inquiry_type" name="inquiry_type" class="form-input" required>
+                                    <option value="">Please select an option...</option>
+                                    <option value="custom_cake">Custom Cake Quote</option>
+                                    <option value="in_person_event">In-Person Guided Experience</option>
+                                    <option value="virtual_event">Virtual Decorating Experience</option>
+                                    <option value="large_group_kits">Large Group Kits (10+)</option>
+                                    <option value="other">Other Inquiry</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="event_date" class="block text-gray-700 font-semibold mb-2">Preferred Date</label>
+                                <input type="date" id="event_date" name="event_date" class="form-input" min="2024-01-01">
+                            </div>
+                        </div>
+                         <div class="mb-6">
+                            <label for="guests" class="block text-gray-700 font-semibold mb-2">Number of Guests / Kits</label>
+                            <input type="number" id="guests" name="guests" class="form-input" min="1">
+                        </div>
+                        <div class="mb-6">
+                            <label for="message" class="block text-gray-700 font-semibold mb-2">Additional Details</label>
+                            <textarea id="message" name="message" rows="5" class="form-input" placeholder="Tell us a bit about your event, desired theme, or any questions you have."></textarea>
+                        </div>
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary w-full md:w-auto">Send Inquiry</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="py-20 bg-secondary">
+            <div class="container mx-auto px-6 flex flex-col md:flex-row items-center gap-12">
+                <div class="md:w-1/2">
+                    <img src="https://placehold.co/600x700/D1C4B7/4A3F35?text=The+Baker" alt="Portrait of the baker" class="rounded-xl shadow-2xl w-full">
+                </div>
+                <div class="md:w-1/2 text-center md:text-left">
+                    <h2 class="text-4xl md:text-5xl font-bold font-serif mb-6">Our Story</h2>
+                    <p class="text-lg text-gray-700 leading-relaxed mb-4">The Gilded Spoon is the sweet creation of Flour Shoppe Studios. It began with a simple idea: that a cake can be more than just a dessert—it can be a centerpiece, a conversation starter, and a work of art. At the studio, we blend time-honored baking techniques with a love for storytelling and design.</p>
+                    <p class="text-lg text-gray-700 leading-relaxed">From our kitchen to yours, we pour our hearts into every creation, hoping to add a little bit of magic and sweetness to your life's special moments.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer id="footer" class="bg-stone-800 text-white py-12">
+        <div class="container mx-auto px-6 text-center">
+            <div class="mb-4">
+                <p class="font-serif text-2xl text-accent">The Gilded Spoon</p>
+                <p class="text-gray-400 text-sm">by Flour Shoppe Studios</p>
+            </div>
+            <p class="mb-4">Contact us to book an event or request a custom quote.</p>
+            <a href="mailto:contact@thegildedspoon.com" class="text-lg hover:text-accent transition-colors duration-300 mb-6 inline-block">contact@thegildedspoon.com</a>
+            <div class="flex justify-center space-x-6 mb-8">
+                <a href="#" class="hover:text-accent transition-colors duration-300">Instagram</a>
+                <a href="#" class="hover:text-accent transition-colors duration-300">Facebook</a>
+                <a href="#" class="hover:text-accent transition-colors duration-300">Pinterest</a>
+            </div>
+            <p class="text-sm text-gray-400">&copy; 2025 Flour Shoppe Studios. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Cart Modal -->
+    <div id="cart-modal" class="cart-modal">
+        <div id="cart-modal-content" class="cart-modal-content">
+            <!-- Cart Header -->
+            <div class="flex justify-between items-center p-6 border-b border-stone-200">
+                <h3 class="text-2xl font-serif">Your Cart</h3>
+                <button id="close-cart-btn" class="text-3xl leading-none focus:outline-none">&times;</button>
+            </div>
+            <!-- Cart Items -->
+            <div id="cart-items-container" class="flex-grow p-6 overflow-y-auto">
+                <!-- Cart items will be dynamically inserted here -->
+                <p id="cart-empty-msg" class="text-center text-gray-500">Your cart is empty.</p>
+            </div>
+            <!-- Cart Footer -->
+            <div id="cart-footer" class="p-6 border-t border-stone-200 hidden">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-lg font-semibold">Subtotal</span>
+                    <span id="cart-subtotal" class="text-lg font-bold text-accent">$0.00</span>
+                </div>
+                <div id="discount-line" class="text-right text-sm text-green-600 mb-4 hidden"></div>
+                <button id="checkout-btn" class="btn btn-primary w-full">Proceed to Checkout</button>
+            </div>
+            <!-- Checkout Form -->
+            <div id="checkout-form-container" class="flex-grow p-6 overflow-y-auto hidden">
+                 <h3 class="text-2xl font-serif mb-6">Local Pickup/Delivery Info</h3>
+                 <p class="text-sm text-gray-600 mb-6">Please provide your details below. We will contact you to confirm your order and coordinate a time for local pickup or delivery.</p>
+                 <form onsubmit="return false;">
+                     <div class="mb-4">
+                        <label for="checkout-name" class="block text-gray-700 font-semibold mb-2">Full Name</label>
+                        <input type="text" id="checkout-name" class="form-input" required>
+                     </div>
+                     <div class="mb-4">
+                        <label for="checkout-email" class="block text-gray-700 font-semibold mb-2">Email</label>
+                        <input type="email" id="checkout-email" class="form-input" required>
+                     </div>
+                     <div class="mb-6">
+                        <label for="checkout-phone" class="block text-gray-700 font-semibold mb-2">Phone Number</label>
+                        <input type="tel" id="checkout-phone" class="form-input">
+                     </div>
+                     <div id="checkout-error-msg" class="text-red-600 text-sm text-center mb-4 hidden">Please fill in all required fields.</div>
+                     <button type="button" id="confirm-order-btn" class="btn btn-primary w-full">Confirm Order</button>
+                     <button type="button" id="back-to-cart-btn" class="w-full text-center text-gray-600 mt-4">Back to Cart</button>
+                 </form>
+            </div>
+            <!-- Order Confirmation -->
+            <div id="order-confirmation" class="flex-grow p-6 overflow-y-auto hidden text-center flex flex-col justify-center">
+                 <h3 class="text-2xl font-serif mb-4 text-accent">Thank You!</h3>
+                 <p class="text-gray-700">Your order has been received. We will contact you shortly to arrange pickup/delivery.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Cart state
+            let cart = [];
+
+            // DOM Elements
+            const cartIcon = document.getElementById('cart-icon');
+            const cartModal = document.getElementById('cart-modal');
+            const closeModalBtn = document.getElementById('close-cart-btn');
+            const cartItemsContainer = document.getElementById('cart-items-container');
+            const cartItemCount = document.getElementById('cart-item-count');
+            const cartEmptyMsg = document.getElementById('cart-empty-msg');
+            const cartFooter = document.getElementById('cart-footer');
+            const cartSubtotalEl = document.getElementById('cart-subtotal');
+            const discountLineEl = document.getElementById('discount-line');
+            
+            const checkoutBtn = document.getElementById('checkout-btn');
+            const checkoutFormContainer = document.getElementById('checkout-form-container');
+            const checkoutErrorMsg = document.getElementById('checkout-error-msg');
+            const backToCartBtn = document.getElementById('back-to-cart-btn');
+            const confirmOrderBtn = document.getElementById('confirm-order-btn');
+            const orderConfirmation = document.getElementById('order-confirmation');
+
+            // --- Event Listeners ---
+            
+            // Open cart modal
+            cartIcon.addEventListener('click', () => cartModal.classList.add('is-open'));
+
+            // Close cart modal
+            closeModalBtn.addEventListener('click', () => cartModal.classList.remove('is-open'));
+            
+            // Close cart modal on overlay click
+            cartModal.addEventListener('click', (e) => {
+                if (e.target === cartModal) {
+                    cartModal.classList.remove('is-open');
+                }
+            });
+
+            // Event delegation for dynamic buttons
+            document.body.addEventListener('click', (e) => {
+                // Add to cart buttons
+                if (e.target.classList.contains('add-to-cart-btn')) {
+                    const name = e.target.dataset.name;
+                    const price = parseFloat(e.target.dataset.price);
+                    addToCart({ name, price });
+                }
+
+                // Handle clicks inside the cart items container (for quantity changes, remove)
+                if (e.target.closest('#cart-items-container')) {
+                    if (e.target.classList.contains('remove-item-btn')) {
+                        removeFromCart(e.target.dataset.name);
+                    } else if (e.target.classList.contains('quantity-change')) {
+                        const change = parseInt(e.target.dataset.change);
+                        updateQuantity(e.target.dataset.name, change);
+                    }
+                }
+                
+                // Mobile Menu Toggle
+                if (e.target.closest('#mobile-menu-button')) {
+                    document.getElementById('mobile-menu').classList.toggle('hidden');
+                }
+                
+                // Close mobile menu when a link is clicked
+                if (e.target.closest('#mobile-menu a')) {
+                    document.getElementById('mobile-menu').classList.add('hidden');
+                }
+            });
+
+            // --- Checkout Flow Listeners ---
+            checkoutBtn.addEventListener('click', () => {
+                cartItemsContainer.classList.add('hidden');
+                cartFooter.classList.add('hidden');
+                checkoutFormContainer.classList.remove('hidden');
+                orderConfirmation.classList.add('hidden');
+            });
+
+            backToCartBtn.addEventListener('click', () => {
+                checkoutFormContainer.classList.add('hidden');
+                cartItemsContainer.classList.remove('hidden');
+                renderCartFooter(); // Re-show footer
+            });
+            
+            confirmOrderBtn.addEventListener('click', () => {
+                const name = document.getElementById('checkout-name').value;
+                const email = document.getElementById('checkout-email').value;
+                if (!name || !email) {
+                    checkoutErrorMsg.classList.remove('hidden');
+                    return;
+                }
+                checkoutErrorMsg.classList.add('hidden');
+                checkoutFormContainer.classList.add('hidden');
+                orderConfirmation.classList.remove('hidden');
+                cart = []; // Clear cart after "purchase"
+                updateCart();
+            });
+
+
+            // --- Cart Functions ---
+            function addToCart(product) {
+                const existingItem = cart.find(item => item.name === product.name);
+                if (existingItem) {
+                    existingItem.quantity++;
+                } else {
+                    cart.push({ ...product, quantity: 1 });
+                }
+                updateCart();
+            }
+
+            function removeFromCart(productName) {
+                cart = cart.filter(item => item.name !== productName);
+                updateCart();
+            }
+
+            function updateQuantity(productName, change) {
+                const item = cart.find(item => item.name === productName);
+                if (item) {
+                    item.quantity += change;
+                    if (item.quantity <= 0) {
+                        removeFromCart(productName);
+                    } else {
+                        updateCart();
+                    }
+                }
+            }
+
+            function calculateSubtotal() {
+                let subtotal = 0;
+                let originalTotal = 0;
+
+                // Separate kits and other items
+                const kits = cart.filter(item => item.name.includes('Kit'));
+                const otherItems = cart.filter(item => !item.name.includes('Kit'));
+
+                // Calculate kit subtotal and apply discount if applicable
+                let kitCount = kits.reduce((sum, item) => sum + item.quantity, 0);
+                let kitSubtotal = kits.reduce((sum, item) => sum + item.price * item.quantity, 0);
+                originalTotal += kitSubtotal;
+                
+                if (kitCount >= 2) {
+                    kitSubtotal *= 0.85; // Apply 15% discount
+                }
+                subtotal += kitSubtotal;
+
+                // Calculate subtotal for other items, checking for pucks
+                otherItems.forEach(item => {
+                    originalTotal += item.price * item.quantity;
+                    if (item.name === 'Cake Puck') {
+                        const pucks = item.quantity;
+                        const bundlesOfThree = Math.floor(pucks / 3);
+                        const remainingPucks = pucks % 3;
+                        subtotal += (bundlesOfThree * 10) + (remainingPucks * 4);
+                    } else {
+                        subtotal += item.price * item.quantity;
+                    }
+                });
+                
+                const discount = originalTotal - subtotal;
+                return { subtotal, discount };
+            }
+
+            function updateCart() {
+                renderCartItems();
+                renderCartFooter();
+                updateCartIcon();
+            }
+
+            function renderCartItems() {
+                if (cart.length === 0) {
+                    cartEmptyMsg.classList.remove('hidden');
+                    cartItemsContainer.innerHTML = ''; // Clear previous items
+                    cartItemsContainer.appendChild(cartEmptyMsg);
+                } else {
+                    cartEmptyMsg.classList.add('hidden');
+                    cartItemsContainer.innerHTML = cart.map(item => `
+                        <div class="flex justify-between items-center mb-4 border-b border-stone-100 pb-4">
+                            <div>
+                                <p class="font-semibold">${item.name}</p>
+                                <p class="text-sm text-gray-600">$${item.price.toFixed(2)}</p>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <button class="quantity-change text-lg" data-name="${item.name}" data-change="-1">-</button>
+                                <span>${item.quantity}</span>
+                                <button class="quantity-change text-lg" data-name="${item.name}" data-change="1">+</button>
+                                <button class="remove-item-btn text-red-500 hover:text-red-700 ml-4 text-2xl leading-none" data-name="${item.name}">&times;</button>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            }
+            
+            function renderCartFooter() {
+                if (cart.length > 0) {
+                    const { subtotal, discount } = calculateSubtotal();
+                    cartSubtotalEl.textContent = `$${subtotal.toFixed(2)}`;
+                    
+                    if (discount > 0) {
+                        discountLineEl.textContent = `Specials applied: -$${discount.toFixed(2)}`;
+                        discountLineEl.classList.remove('hidden');
+                    } else {
+                        discountLineEl.classList.add('hidden');
+                    }
+                    
+                    cartFooter.classList.remove('hidden');
+                } else {
+                    cartFooter.classList.add('hidden');
+                }
+            }
+
+            function updateCartIcon() {
+                const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+                if (totalItems > 0) {
+                    cartItemCount.textContent = totalItems;
+                    cartItemCount.classList.remove('hidden');
+                } else {
+                    cartItemCount.classList.add('hidden');
+                }
+            }
+
+            // --- Smooth Scroll for anchor links ---
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    const href = this.getAttribute('href');
+                    if (href.length > 1) {
+                        e.preventDefault();
+                        document.querySelector(href).scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
