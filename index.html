@@ -14,7 +14,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700&family=Raleway:wght@400;500;600&display=swap" rel="stylesheet">
 
     <style>
-        /* Custom styles to achieve the desired aesthetic */
+        /* Custom base styles */
         body {
             font-family: 'Raleway', sans-serif;
             background-color: #FDF8F5; /* A very light, warm pink/beige */
@@ -35,33 +35,31 @@
         .bg-secondary {
             background-color: #EFEAE6; /* A complementary soft beige */
         }
-        .btn {
-            @apply inline-block px-8 py-3 text-center font-semibold rounded-lg transition-transform duration-300 ease-in-out;
-        }
-        .btn-primary {
-            @apply bg-accent text-white hover:bg-opacity-90 shadow-lg hover:scale-105;
-        }
-        .btn-secondary {
-            @apply bg-transparent border-2 border-accent text-accent hover:bg-accent hover:text-white;
-        }
-        .section-title {
-            @apply text-4xl md:text-5xl font-bold text-center mb-4;
-        }
-        .section-subtitle {
-            @apply text-lg text-center text-gray-600 mb-12 max-w-2xl mx-auto;
-        }
-        .form-input {
-            @apply w-full p-3 bg-white rounded-lg border border-stone-300 focus:outline-none focus:ring-2 focus:ring-accent/50 transition-shadow;
-        }
-        /* Cart styles */
+        /* Cart styles (these do not use @apply and are fine) */
         .cart-icon-container {
             position: relative;
         }
         .cart-item-count {
-            @apply absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center;
+            position: absolute;
+            top: -0.5rem;
+            right: -0.5rem;
+            background-color: #ef4444; /* bg-red-500 */
+            color: white;
+            font-size: 0.75rem; /* text-xs */
+            border-radius: 9999px; /* rounded-full */
+            height: 1.25rem; /* h-5 */
+            width: 1.25rem; /* w-5 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .cart-modal {
-            @apply fixed inset-0 bg-black/50 z-50 flex justify-end;
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 50;
+            display: flex;
+            justify-content: flex-end;
             visibility: hidden;
             opacity: 0;
             transition: visibility 0s 0.3s, opacity 0.3s;
@@ -72,7 +70,14 @@
             transition: visibility 0s, opacity 0.3s;
         }
         .cart-modal-content {
-            @apply bg-white h-full w-full max-w-md shadow-2xl flex flex-col transform translate-x-full;
+            background-color: white;
+            height: 100%;
+            width: 100%;
+            max-width: 28rem; /* max-w-md */
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); /* shadow-2xl */
+            display: flex;
+            flex-direction: column;
+            transform: translateX(100%);
             transition: transform 0.3s ease-in-out;
         }
         .cart-modal.is-open .cart-modal-content {
@@ -125,7 +130,7 @@
                 <h1 class="text-5xl md:text-7xl font-bold leading-tight">Where Every Cake Tells a Story</h1>
                 <p class="mt-6 text-xl md:text-2xl text-gray-700 max-w-3xl mx-auto">Artisanal cakes, creative kits, and charming goods, crafted with passion and a touch of whimsy.</p>
                 <div class="mt-10">
-                    <a href="#kits" class="btn btn-primary">Discover Our Kits</a>
+                    <a href="#kits" class="inline-block px-8 py-3 text-center font-semibold rounded-lg transition-transform duration-300 ease-in-out bg-accent text-white hover:bg-opacity-90 shadow-lg hover:scale-105">Discover Our Kits</a>
                 </div>
             </div>
         </section>
@@ -133,8 +138,8 @@
         <!-- Bakery Offerings Section -->
         <section id="bakery" class="py-20">
             <div class="container mx-auto px-6">
-                <h2 class="section-title">From Our Bakery</h2>
-                <p class="section-subtitle">Freshly baked delights, made from scratch with the finest ingredients. Perfect for a simple treat or a grand celebration.</p>
+                <h2 class="text-4xl md:text-5xl font-bold text-center mb-4 font-serif">From Our Bakery</h2>
+                <p class="text-lg text-center text-gray-600 mb-12 max-w-2xl mx-auto">Freshly baked delights, made from scratch with the finest ingredients. Perfect for a simple treat or a grand celebration.</p>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                     <!-- Cake by the Slice -->
                     <div class="bg-white p-8 rounded-xl shadow-lg text-center flex flex-col">
@@ -142,7 +147,7 @@
                         <h3 class="text-2xl font-serif font-semibold mb-2">Cake by the Slice</h3>
                         <p class="text-accent font-bold text-xl mb-4">$8</p>
                         <p class="text-gray-600 mb-6 flex-grow">A generous slice of our signature, multi-layered cake. Flavors rotate weekly, always offering something new and delicious.</p>
-                        <button class="btn btn-secondary mt-auto add-to-cart-btn" data-name="Cake by the Slice" data-price="8.00">Add to Cart</button>
+                        <button class="inline-block px-8 py-3 text-center font-semibold rounded-lg transition-transform duration-300 ease-in-out bg-transparent border-2 border-accent text-accent hover:bg-accent hover:text-white mt-auto add-to-cart-btn" data-name="Cake by the Slice" data-price="8.00">Add to Cart</button>
                     </div>
                     <!-- Cake Pucks -->
                     <div class="bg-white p-8 rounded-xl shadow-lg text-center flex flex-col">
@@ -150,7 +155,7 @@
                         <h3 class="text-2xl font-serif font-semibold mb-2">Cake Pucks</h3>
                         <p class="text-accent font-bold text-xl mb-4">$4 each or 3 for $10</p>
                         <p class="text-gray-600 mb-6 flex-grow">A modern take on a cake pop. A dense, puck-shaped treat dipped in chocolate and beautifully decorated.</p>
-                        <button class="btn btn-secondary mt-auto add-to-cart-btn" data-name="Cake Puck" data-price="4.00">Add to Cart</button>
+                        <button class="inline-block px-8 py-3 text-center font-semibold rounded-lg transition-transform duration-300 ease-in-out bg-transparent border-2 border-accent text-accent hover:bg-accent hover:text-white mt-auto add-to-cart-btn" data-name="Cake Puck" data-price="4.00">Add to Cart</button>
                     </div>
                     <!-- Custom Edible Images -->
                     <div class="bg-white p-8 rounded-xl shadow-lg text-center flex flex-col">
@@ -158,7 +163,7 @@
                         <h3 class="text-2xl font-serif font-semibold mb-2">Custom Edible Images</h3>
                         <p class="text-accent font-bold text-xl mb-4">$15</p>
                         <p class="text-gray-600 mb-6 flex-grow">Print your photos or designs onto an 8.5" x 11" icing sheet for a truly personal touch on your celebration cakes.</p>
-                        <button class="btn btn-secondary mt-auto add-to-cart-btn" data-name="Custom Edible Image" data-price="15.00">Add to Cart</button>
+                        <button class="inline-block px-8 py-3 text-center font-semibold rounded-lg transition-transform duration-300 ease-in-out bg-transparent border-2 border-accent text-accent hover:bg-accent hover:text-white mt-auto add-to-cart-btn" data-name="Custom Edible Image" data-price="15.00">Add to Cart</button>
                     </div>
                 </div>
                 <!-- Custom Cakes Callout -->
@@ -167,7 +172,7 @@
                     <div class="p-10 text-center md:text-left">
                         <h3 class="text-3xl font-serif font-bold mb-3">Custom Celebration Cakes</h3>
                         <p class="text-gray-600 leading-relaxed mb-6">For birthdays, weddings, and any moment worth celebrating. Let's work together to design a bespoke cake that's as unique as your event. Available by quote only.</p>
-                        <a href="#booking" class="btn btn-secondary">Request a Quote</a>
+                        <a href="#booking" class="inline-block px-8 py-3 text-center font-semibold rounded-lg transition-transform duration-300 ease-in-out bg-transparent border-2 border-accent text-accent hover:bg-accent hover:text-white">Request a Quote</a>
                     </div>
                 </div>
             </div>
@@ -176,8 +181,8 @@
         <!-- DIY Kits Section -->
         <section id="kits" class="py-20 bg-secondary">
             <div class="container mx-auto px-6">
-                <h2 class="section-title">DIY Cake Decorating Kits</h2>
-                <p class="section-subtitle">Each set comes with everything you need: a 4-inch mini cake, themed frostings, a special sprinkle mix, a custom-designed apron, and an instruction card.</p>
+                <h2 class="text-4xl md:text-5xl font-bold text-center mb-4 font-serif">DIY Cake Decorating Kits</h2>
+                <p class="text-lg text-center text-gray-600 mb-12 max-w-2xl mx-auto">Each set comes with everything you need: a 4-inch mini cake, themed frostings, a special sprinkle mix, a custom-designed apron, and an instruction card.</p>
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
                     <!-- Express Your Mood Kit -->
                     <div class="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col">
@@ -186,7 +191,7 @@
                             <h3 class="text-2xl font-serif font-bold mb-2">"Express Your Mood" Kit</h3>
                             <p class="text-accent font-bold text-2xl mb-4">$74</p>
                             <p class="text-gray-600 mb-6 flex-grow">This kit is all about color and personality. It comes with a vibrant palette of frostings and bold decorations, perfect for creating a cake that's uniquely you.</p>
-                            <button class="btn btn-secondary mt-auto add-to-cart-btn" data-name="Express Your Mood Kit" data-price="74.00">Add to Cart</button>
+                            <button class="inline-block px-8 py-3 text-center font-semibold rounded-lg transition-transform duration-300 ease-in-out bg-transparent border-2 border-accent text-accent hover:bg-accent hover:text-white mt-auto add-to-cart-btn" data-name="Express Your Mood Kit" data-price="74.00">Add to Cart</button>
                         </div>
                     </div>
                     <!-- Whispers of Wonderland Kit -->
@@ -196,7 +201,7 @@
                             <h3 class="text-2xl font-serif font-bold mb-2">"Whispers of Wonderland" Kit</h3>
                             <p class="text-accent font-bold text-2xl mb-4">$95</p>
                             <p class="text-gray-600 mb-6 flex-grow">Create a little magic with this whimsical kit. It features soft pastel frostings, edible glitter, and other enchanting decorations for a beautiful, storybook-style cake.</p>
-                            <button class="btn btn-primary mt-auto add-to-cart-btn" data-name="Whispers of Wonderland Kit" data-price="95.00">Add to Cart</button>
+                            <button class="inline-block px-8 py-3 text-center font-semibold rounded-lg transition-transform duration-300 ease-in-out bg-accent text-white hover:bg-opacity-90 shadow-lg hover:scale-105 mt-auto add-to-cart-btn" data-name="Whispers of Wonderland Kit" data-price="95.00">Add to Cart</button>
                         </div>
                     </div>
                     <!-- Craft Your Own Tale Kit -->
@@ -206,7 +211,7 @@
                             <h3 class="text-2xl font-serif font-bold mb-2">"Craft Your Own Tale" Kit</h3>
                             <p class="text-accent font-bold text-2xl mb-4">$120</p>
                             <p class="text-gray-600 mb-6 flex-grow">Our most detailed kit, for those who love storytelling. It includes specialty tools, intricate edible decorations, and literary-inspired touches.</p>
-                            <button class="btn btn-secondary mt-auto add-to-cart-btn" data-name="Craft Your Own Tale Kit" data-price="120.00">Add to Cart</button>
+                            <button class="inline-block px-8 py-3 text-center font-semibold rounded-lg transition-transform duration-300 ease-in-out bg-transparent border-2 border-accent text-accent hover:bg-accent hover:text-white mt-auto add-to-cart-btn" data-name="Craft Your Own Tale Kit" data-price="120.00">Add to Cart</button>
                         </div>
                     </div>
                 </div>
@@ -220,15 +225,15 @@
         <!-- Experiences Section -->
         <section id="experiences" class="py-20">
             <div class="container mx-auto px-6">
-                <h2 class="section-title">Guided Experiences & Group Events</h2>
-                <p class="section-subtitle">Bring a touch of creative magic to your next gathering. We offer a range of decorating experiences perfect for any occasion.</p>
+                <h2 class="text-4xl md:text-5xl font-bold text-center mb-4 font-serif">Guided Experiences & Group Events</h2>
+                <p class="text-lg text-center text-gray-600 mb-12 max-w-2xl mx-auto">Bring a touch of creative magic to your next gathering. We offer a range of decorating experiences perfect for any occasion.</p>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
                     <!-- In-Person Events -->
                     <div class="bg-white p-8 rounded-xl shadow-lg flex flex-col items-center text-center">
                         <img src="https://i.imgur.com/VuYQ7Wr.jpeg" alt="People decorating cakes at an event" class="w-full h-56 object-cover rounded-lg mb-6">
                         <h3 class="text-3xl font-serif font-bold mb-3">In-Person Guided Experiences</h3>
                         <p class="text-gray-600 leading-relaxed mb-6 flex-grow">Host a memorable event! We bring our themed cake decorating experiences to you. Perfect for corporate events, bridal showers, girls' nights, and private parties. We handle the setup, guidance, and cleanup.</p>
-                        <a href="#booking" class="btn btn-primary mt-auto">Book Your Event</a>
+                        <a href="#booking" class="inline-block px-8 py-3 text-center font-semibold rounded-lg transition-transform duration-300 ease-in-out bg-accent text-white hover:bg-opacity-90 shadow-lg hover:scale-105 mt-auto">Book Your Event</a>
                     </div>
                     <!-- Virtual & Large Group Kits -->
                     <div class="bg-white p-8 rounded-xl shadow-lg flex flex-col items-center text-center">
@@ -240,7 +245,7 @@
                         <p class="text-gray-600 leading-relaxed mb-6 flex-grow">
                             <strong>Large Gatherings (10+):</strong> Order our classic DIY kits in bulk for your large group. Contact us for special pricing.
                         </p>
-                        <a href="#booking" class="btn btn-secondary mt-auto">Inquire About Kits</a>
+                        <a href="#booking" class="inline-block px-8 py-3 text-center font-semibold rounded-lg transition-transform duration-300 ease-in-out bg-transparent border-2 border-accent text-accent hover:bg-accent hover:text-white mt-auto">Inquire About Kits</a>
                     </div>
                 </div>
             </div>
@@ -249,8 +254,8 @@
         <!-- Merchandise & Literary Goods Section -->
         <section id="goods" class="py-20 bg-secondary">
             <div class="container mx-auto px-6">
-                <h2 class="section-title">Merchandise & Literary Goods</h2>
-                <p class="section-subtitle">A curated collection of charming goods for the creative soul and cake lover alike.</p>
+                <h2 class="text-4xl md:text-5xl font-bold text-center mb-4 font-serif">Merchandise & Literary Goods</h2>
+                <p class="text-lg text-center text-gray-600 mb-12 max-w-2xl mx-auto">A curated collection of charming goods for the creative soul and cake lover alike.</p>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                     <!-- T-Shirts -->
                     <div class="bg-white p-8 rounded-xl shadow-lg text-center flex flex-col">
@@ -258,7 +263,7 @@
                         <h3 class="text-2xl font-serif font-semibold mb-2">Branded T-Shirts</h3>
                         <p class="text-accent font-bold text-xl mb-4">$25</p>
                         <p class="text-gray-600 mb-6 flex-grow">High-quality, soft cotton t-shirts featuring our logo or a fun, cake-themed design. Show your support in style!</p>
-                         <button class="btn btn-secondary mt-auto add-to-cart-btn" data-name="Branded T-Shirt" data-price="25.00">Add to Cart</button>
+                         <button class="inline-block px-8 py-3 text-center font-semibold rounded-lg transition-transform duration-300 ease-in-out bg-transparent border-2 border-accent text-accent hover:bg-accent hover:text-white mt-auto add-to-cart-btn" data-name="Branded T-Shirt" data-price="25.00">Add to Cart</button>
                     </div>
                     <!-- Artisan Postcards -->
                     <div class="bg-white p-8 rounded-xl shadow-lg text-center flex flex-col">
@@ -266,7 +271,7 @@
                         <h3 class="text-2xl font-serif font-semibold mb-2">Artisan Postcards (Set of 3)</h3>
                         <p class="text-accent font-bold text-xl mb-4">$10</p>
                         <p class="text-gray-600 mb-6 flex-grow">Beautifully designed postcards with illustrations of our most popular cakes and charming bakery artwork.</p>
-                         <button class="btn btn-secondary mt-auto add-to-cart-btn" data-name="Artisan Postcard Set" data-price="10.00">Add to Cart</button>
+                         <button class="inline-block px-8 py-3 text-center font-semibold rounded-lg transition-transform duration-300 ease-in-out bg-transparent border-2 border-accent text-accent hover:bg-accent hover:text-white mt-auto add-to-cart-btn" data-name="Artisan Postcard Set" data-price="10.00">Add to Cart</button>
                     </div>
                     <!-- Custom-Cover Journals -->
                     <div class="bg-white p-8 rounded-xl shadow-lg text-center flex flex-col">
@@ -274,7 +279,7 @@
                         <h3 class="text-2xl font-serif font-semibold mb-2">Custom-Cover Journals</h3>
                         <p class="text-accent font-bold text-xl mb-4">$18</p>
                         <p class="text-gray-600 mb-6 flex-grow">Lined journals with unique, literary-inspired cover art that complements our creative, whimsical spirit.</p>
-                         <button class="btn btn-secondary mt-auto add-to-cart-btn" data-name="Custom-Cover Journal" data-price="18.00">Add to Cart</button>
+                         <button class="inline-block px-8 py-3 text-center font-semibold rounded-lg transition-transform duration-300 ease-in-out bg-transparent border-2 border-accent text-accent hover:bg-accent hover:text-white mt-auto add-to-cart-btn" data-name="Custom-Cover Journal" data-price="18.00">Add to Cart</button>
                     </div>
                 </div>
             </div>
@@ -283,24 +288,24 @@
         <!-- Booking Section -->
         <section id="booking" class="py-20">
             <div class="container mx-auto px-6">
-                <h2 class="section-title">Book an Experience or Request a Quote</h2>
-                <p class="section-subtitle">We'd love to be a part of your celebration. Please fill out the form below, and we'll get back to you shortly to confirm details and availability.</p>
+                <h2 class="text-4xl md:text-5xl font-bold text-center mb-4 font-serif">Book an Experience or Request a Quote</h2>
+                <p class="text-lg text-center text-gray-600 mb-12 max-w-2xl mx-auto">We'd love to be a part of your celebration. Please fill out the form below, and we'll get back to you shortly to confirm details and availability.</p>
                 <div class="max-w-3xl mx-auto bg-white p-8 md:p-12 rounded-xl shadow-2xl">
                     <form action="#" method="POST" onsubmit="return false;">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                             <div>
                                 <label for="name" class="block text-gray-700 font-semibold mb-2">Full Name</label>
-                                <input type="text" id="name" name="name" class="form-input" required>
+                                <input type="text" id="name" name="name" class="w-full p-3 bg-white rounded-lg border border-stone-300 focus:outline-none focus:ring-2 focus:ring-accent/50 transition-shadow" required>
                             </div>
                             <div>
                                 <label for="email" class="block text-gray-700 font-semibold mb-2">Email Address</label>
-                                <input type="email" id="email" name="email" class="form-input" required>
+                                <input type="email" id="email" name="email" class="w-full p-3 bg-white rounded-lg border border-stone-300 focus:outline-none focus:ring-2 focus:ring-accent/50 transition-shadow" required>
                             </div>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                             <div>
                                 <label for="inquiry_type" class="block text-gray-700 font-semibold mb-2">I'm Interested In...</label>
-                                <select id="inquiry_type" name="inquiry_type" class="form-input" required>
+                                <select id="inquiry_type" name="inquiry_type" class="w-full p-3 bg-white rounded-lg border border-stone-300 focus:outline-none focus:ring-2 focus:ring-accent/50 transition-shadow" required>
                                     <option value="">Please select an option...</option>
                                     <option value="custom_cake">Custom Cake Quote</option>
                                     <option value="in_person_event">In-Person Guided Experience</option>
@@ -311,19 +316,19 @@
                             </div>
                             <div>
                                 <label for="event_date" class="block text-gray-700 font-semibold mb-2">Preferred Date</label>
-                                <input type="date" id="event_date" name="event_date" class="form-input" min="2024-01-01">
+                                <input type="date" id="event_date" name="event_date" class="w-full p-3 bg-white rounded-lg border border-stone-300 focus:outline-none focus:ring-2 focus:ring-accent/50 transition-shadow" min="2024-01-01">
                             </div>
                         </div>
                          <div class="mb-6">
                             <label for="guests" class="block text-gray-700 font-semibold mb-2">Number of Guests / Kits</label>
-                            <input type="number" id="guests" name="guests" class="form-input" min="1">
+                            <input type="number" id="guests" name="guests" class="w-full p-3 bg-white rounded-lg border border-stone-300 focus:outline-none focus:ring-2 focus:ring-accent/50 transition-shadow" min="1">
                         </div>
                         <div class="mb-6">
                             <label for="message" class="block text-gray-700 font-semibold mb-2">Additional Details</label>
-                            <textarea id="message" name="message" rows="5" class="form-input" placeholder="Tell us a bit about your event, desired theme, or any questions you have."></textarea>
+                            <textarea id="message" name="message" rows="5" class="w-full p-3 bg-white rounded-lg border border-stone-300 focus:outline-none focus:ring-2 focus:ring-accent/50 transition-shadow" placeholder="Tell us a bit about your event, desired theme, or any questions you have."></textarea>
                         </div>
                         <div class="text-center">
-                            <button type="submit" class="btn btn-primary w-full md:w-auto">Send Inquiry</button>
+                            <button type="submit" class="inline-block px-8 py-3 text-center font-semibold rounded-lg transition-transform duration-300 ease-in-out bg-accent text-white hover:bg-opacity-90 shadow-lg hover:scale-105 w-full md:w-auto">Send Inquiry</button>
                         </div>
                     </form>
                 </div>
@@ -353,7 +358,7 @@
                 <p class="text-gray-400 text-sm">by Flour Shoppe Studios</p>
             </div>
             <p class="mb-4">Contact us to book an event or request a custom quote.</p>
-            <a href="mailto:letscake@flourshoppestudios.com" class="text-lg hover:text-accent transition-colors duration-300 mb-6 inline-block">contact@thegildedspoon.com</a>
+            <a href="mailto:contact@thegildedspoonshoppe.com" class="text-lg hover:text-accent transition-colors duration-300 mb-6 inline-block">contact@thegildedspoonshoppe.com</a>
             <div class="flex justify-center space-x-6 mb-8">
                 <a href="#" class="hover:text-accent transition-colors duration-300">Instagram</a>
                 <a href="#" class="hover:text-accent transition-colors duration-300">Facebook</a>
@@ -383,7 +388,7 @@
                     <span id="cart-subtotal" class="text-lg font-bold text-accent">$0.00</span>
                 </div>
                 <div id="discount-line" class="text-right text-sm text-green-600 mb-4 hidden"></div>
-                <button id="checkout-btn" class="btn btn-primary w-full">Proceed to Checkout</button>
+                <button id="checkout-btn" class="inline-block px-8 py-3 text-center font-semibold rounded-lg transition-transform duration-300 ease-in-out bg-accent text-white hover:bg-opacity-90 shadow-lg hover:scale-105 w-full">Proceed to Checkout</button>
             </div>
             <!-- Checkout Form -->
             <div id="checkout-form-container" class="flex-grow p-6 overflow-y-auto hidden">
@@ -391,19 +396,19 @@
                  <p class="text-sm text-gray-600 mb-6">Please provide your details below. We will contact you to confirm your order and coordinate a time for local pickup or delivery.</p>
                  <form onsubmit="return false;">
                      <div class="mb-4">
-                        <label for="checkout-name" class="block text-gray-700 font-semibold mb-2">Full Name</label>
-                        <input type="text" id="checkout-name" class="form-input" required>
+                         <label for="checkout-name" class="block text-gray-700 font-semibold mb-2">Full Name</label>
+                         <input type="text" id="checkout-name" class="w-full p-3 bg-white rounded-lg border border-stone-300 focus:outline-none focus:ring-2 focus:ring-accent/50 transition-shadow" required>
                      </div>
                      <div class="mb-4">
-                        <label for="checkout-email" class="block text-gray-700 font-semibold mb-2">Email</label>
-                        <input type="email" id="checkout-email" class="form-input" required>
+                         <label for="checkout-email" class="block text-gray-700 font-semibold mb-2">Email</label>
+                         <input type="email" id="checkout-email" class="w-full p-3 bg-white rounded-lg border border-stone-300 focus:outline-none focus:ring-2 focus:ring-accent/50 transition-shadow" required>
                      </div>
                      <div class="mb-6">
-                        <label for="checkout-phone" class="block text-gray-700 font-semibold mb-2">Phone Number</label>
-                        <input type="tel" id="checkout-phone" class="form-input">
+                         <label for="checkout-phone" class="block text-gray-700 font-semibold mb-2">Phone Number</label>
+                         <input type="tel" id="checkout-phone" class="w-full p-3 bg-white rounded-lg border border-stone-300 focus:outline-none focus:ring-2 focus:ring-accent/50 transition-shadow">
                      </div>
                      <div id="checkout-error-msg" class="text-red-600 text-sm text-center mb-4 hidden">Please fill in all required fields.</div>
-                     <button type="button" id="confirm-order-btn" class="btn btn-primary w-full">Confirm Order</button>
+                     <button type="button" id="confirm-order-btn" class="inline-block px-8 py-3 text-center font-semibold rounded-lg transition-transform duration-300 ease-in-out bg-accent text-white hover:bg-opacity-90 shadow-lg hover:scale-105 w-full">Confirm Order</button>
                      <button type="button" id="back-to-cart-btn" class="w-full text-center text-gray-600 mt-4">Back to Cart</button>
                  </form>
             </div>
@@ -473,13 +478,15 @@
                 }
                 
                 // Mobile Menu Toggle
-                if (e.target.closest('#mobile-menu-button')) {
-                    document.getElementById('mobile-menu').classList.toggle('hidden');
+                const mobileMenuButton = document.getElementById('mobile-menu-button');
+                const mobileMenu = document.getElementById('mobile-menu');
+                if (mobileMenuButton.contains(e.target)) {
+                    mobileMenu.classList.toggle('hidden');
                 }
                 
                 // Close mobile menu when a link is clicked
-                if (e.target.closest('#mobile-menu a')) {
-                    document.getElementById('mobile-menu').classList.add('hidden');
+                if (mobileMenu.contains(e.target) && e.target.tagName === 'A') {
+                    mobileMenu.classList.add('hidden');
                 }
             });
 
@@ -582,9 +589,11 @@
             }
 
             function renderCartItems() {
+                // FIX: Clear the container first to prevent duplicating items.
+                cartItemsContainer.innerHTML = '';
+
                 if (cart.length === 0) {
                     cartEmptyMsg.classList.remove('hidden');
-                    cartItemsContainer.innerHTML = ''; // Clear previous items
                     cartItemsContainer.appendChild(cartEmptyMsg);
                 } else {
                     cartEmptyMsg.classList.add('hidden');
