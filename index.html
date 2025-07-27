@@ -13,6 +13,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700&family=Raleway:wght@400;500;600&display=swap" rel="stylesheet">
 
+    <!-- Stripe.js Script -->
+    <script src="https://js.stripe.com/v3/"></script>
+
     <style>
         /* Custom base styles */
         body {
@@ -35,7 +38,7 @@
         .bg-secondary {
             background-color: #EFEAE6; /* A complementary soft beige */
         }
-        /* Cart styles (these do not use @apply and are fine) */
+        /* Cart and Modal styles */
         .cart-icon-container {
             position: relative;
         }
@@ -43,28 +46,29 @@
             position: absolute;
             top: -0.5rem;
             right: -0.5rem;
-            background-color: #ef4444; /* bg-red-500 */
+            background-color: #ef4444;
             color: white;
-            font-size: 0.75rem; /* text-xs */
-            border-radius: 9999px; /* rounded-full */
-            height: 1.25rem; /* h-5 */
-            width: 1.25rem; /* w-5 */
+            font-size: 0.75rem;
+            border-radius: 9999px;
+            height: 1.25rem;
+            width: 1.25rem;
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        .cart-modal {
+        .modal-overlay {
             position: fixed;
             inset: 0;
             background-color: rgba(0, 0, 0, 0.5);
             z-index: 50;
             display: flex;
-            justify-content: flex-end;
+            align-items: center;
+            justify-content: center;
             visibility: hidden;
             opacity: 0;
             transition: visibility 0s 0.3s, opacity 0.3s;
         }
-        .cart-modal.is-open {
+        .modal-overlay.is-open {
             visibility: visible;
             opacity: 1;
             transition: visibility 0s, opacity 0.3s;
@@ -73,22 +77,43 @@
             background-color: white;
             height: 100%;
             width: 100%;
-            max-width: 28rem; /* max-w-md */
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); /* shadow-2xl */
+            max-width: 28rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
             display: flex;
             flex-direction: column;
+            position: fixed;
+            right: 0;
+            top: 0;
             transform: translateX(100%);
             transition: transform 0.3s ease-in-out;
         }
-        .cart-modal.is-open .cart-modal-content {
+        .modal-overlay.is-open .cart-modal-content {
             transform: translateX(0);
         }
+        .legal-modal-content {
+            background-color: white;
+            max-height: 80vh;
+            width: 100%;
+            max-width: 48rem; /* max-w-3xl */
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            transform: scale(0.95);
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        .modal-overlay.is-open .legal-modal-content {
+             opacity: 1;
+             transform: scale(1);
+        }
+
     </style>
 </head>
 <body class="antialiased">
 
     <!-- Header -->
-    <header class="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-50">
+    <header class="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-40">
         <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
             <a href="#" class="text-center">
                 <span class="text-3xl font-serif font-bold text-accent block">The Gilded Spoon</span>
@@ -134,6 +159,9 @@
                 </div>
             </div>
         </section>
+
+        <!-- Payment Status Message -->
+        <div id="payment-status-message" class="hidden container mx-auto px-6 mt-8 text-center"></div>
 
         <!-- Bakery Offerings Section -->
         <section id="bakery" class="py-20">
@@ -397,17 +425,22 @@
                 <a href="#" class="hover:text-accent transition-colors duration-300">Facebook</a>
                 <a href="#" class="hover:text-accent transition-colors duration-300">Pinterest</a>
             </div>
+            <div class="flex justify-center space-x-4 mb-8 text-sm text-gray-400">
+                <button class="hover:text-accent transition-colors duration-300" data-modal-target="privacy-policy-modal">Privacy Policy</button>
+                <span>&middot;</span>
+                <button class="hover:text-accent transition-colors duration-300" data-modal-target="terms-modal">Terms & Conditions</button>
+            </div>
             <p class="text-sm text-gray-400">&copy; 2025 Flour Shoppe Studios. All Rights Reserved.</p>
         </div>
     </footer>
 
     <!-- Cart Modal -->
-    <div id="cart-modal" class="cart-modal">
-        <div id="cart-modal-content" class="cart-modal-content">
+    <div id="cart-modal" class="modal-overlay">
+        <div class="cart-modal-content">
             <!-- Cart Header -->
             <div class="flex justify-between items-center p-6 border-b border-stone-200">
                 <h3 class="text-2xl font-serif">Your Cart</h3>
-                <button id="close-cart-btn" class="text-3xl leading-none focus:outline-none">&times;</button>
+                <button class="text-3xl leading-none focus:outline-none close-modal-btn">&times;</button>
             </div>
             <!-- Cart Items -->
             <div id="cart-items-container" class="flex-grow p-6 overflow-y-auto">
@@ -423,76 +456,107 @@
                 <div id="discount-line" class="text-right text-sm text-green-600 mb-4 hidden"></div>
                 <button id="checkout-btn" class="inline-block px-8 py-3 text-center font-semibold rounded-lg transition-transform duration-300 ease-in-out bg-accent text-white hover:bg-opacity-90 shadow-lg hover:scale-105 w-full">Proceed to Checkout</button>
             </div>
-            <!-- Checkout Form -->
-            <div id="checkout-form-container" class="flex-grow p-6 overflow-y-auto hidden">
-                 <h3 class="text-2xl font-serif mb-6">Local Pickup/Delivery Info</h3>
-                 <p class="text-sm text-gray-600 mb-6">Please provide your details below. We will contact you to confirm your order and coordinate a time for local pickup or delivery.</p>
-                 <form onsubmit="return false;">
-                     <div class="mb-4">
-                         <label for="checkout-name" class="block text-gray-700 font-semibold mb-2">Full Name</label>
-                         <input type="text" id="checkout-name" class="w-full p-3 bg-white rounded-lg border border-stone-300 focus:outline-none focus:ring-2 focus:ring-accent/50 transition-shadow" required>
-                     </div>
-                     <div class="mb-4">
-                         <label for="checkout-email" class="block text-gray-700 font-semibold mb-2">Email</label>
-                         <input type="email" id="checkout-email" class="w-full p-3 bg-white rounded-lg border border-stone-300 focus:outline-none focus:ring-2 focus:ring-accent/50 transition-shadow" required>
-                     </div>
-                     <div class="mb-6">
-                         <label for="checkout-phone" class="block text-gray-700 font-semibold mb-2">Phone Number</label>
-                         <input type="tel" id="checkout-phone" class="w-full p-3 bg-white rounded-lg border border-stone-300 focus:outline-none focus:ring-2 focus:ring-accent/50 transition-shadow">
-                     </div>
-                     <div id="checkout-error-msg" class="text-red-600 text-sm text-center mb-4 hidden">Please fill in all required fields.</div>
-                     <button type="button" id="confirm-order-btn" class="inline-block px-8 py-3 text-center font-semibold rounded-lg transition-transform duration-300 ease-in-out bg-accent text-white hover:bg-opacity-90 shadow-lg hover:scale-105 w-full">Confirm Order</button>
-                     <button type="button" id="back-to-cart-btn" class="w-full text-center text-gray-600 mt-4">Back to Cart</button>
-                 </form>
+        </div>
+    </div>
+
+    <!-- Privacy Policy Modal -->
+    <div id="privacy-policy-modal" class="modal-overlay">
+        <div class="legal-modal-content">
+            <div class="flex justify-between items-center p-6 border-b border-stone-200">
+                <h3 class="text-2xl font-serif">Privacy Policy</h3>
+                <button class="text-3xl leading-none focus:outline-none close-modal-btn">&times;</button>
             </div>
-            <!-- Order Confirmation -->
-            <div id="order-confirmation" class="flex-grow p-6 overflow-y-auto hidden text-center flex flex-col justify-center">
-                 <h3 class="text-2xl font-serif mb-4 text-accent">Thank You!</h3>
-                 <p class="text-gray-700">Your order has been received. We will contact you shortly to arrange pickup/delivery.</p>
+            <div class="p-8 overflow-y-auto prose max-w-none">
+                <h4>Last Updated: July 27, 2025</h4>
+                <p>Flour Shoppe Studios, LLC ("we," "us," or "our") operates The Gilded Spoon website (the "Service"). This page informs you of our policies regarding the collection, use, and disclosure of personal data when you use our Service and the choices you have associated with that data.</p>
+                
+                <h4>Information Collection and Use</h4>
+                <p>We collect several different types of information for various purposes to provide and improve our Service to you. This includes, but is not limited to, your name, email address, and phone number when you place an order or submit an inquiry.</p>
+
+                <h4>Payment Processing</h4>
+                <p>We use Stripe, a third-party payment processor, to handle all online payments. We do not store or have access to your credit card details. All payment information is provided directly to Stripe, whose use of your personal information is governed by their Privacy Policy.</p>
+
+                <h4>Use of Data</h4>
+                <p>We use the collected data to process your orders, communicate with you, and improve our services. We will not share your personal information with any third parties, other than as necessary to fulfill your request (e.g., to process a payment).</p>
+
+                <h4>Your Rights</h4>
+                <p>You have the right to access, update, or delete the information we have on you. If you wish to be informed what Personal Data we hold about you and if you want it to be removed from our systems, please contact us.</p>
+                <p><strong>Contact Us:</strong> If you have any questions about this Privacy Policy, please contact us at contact@thegildedspoonshoppe.com.</p>
             </div>
         </div>
     </div>
 
+    <!-- Terms & Conditions Modal -->
+    <div id="terms-modal" class="modal-overlay">
+        <div class="legal-modal-content">
+            <div class="flex justify-between items-center p-6 border-b border-stone-200">
+                <h3 class="text-2xl font-serif">Terms & Conditions</h3>
+                <button class="text-3xl leading-none focus:outline-none close-modal-btn">&times;</button>
+            </div>
+            <div class="p-8 overflow-y-auto prose max-w-none">
+                <h4>1. Agreement to Terms</h4>
+                <p>By accessing our website and purchasing our products, you agree to be bound by these Terms and Conditions. If you disagree with any part of the terms, then you may not access the Service.</p>
+
+                <h4>2. Products and Orders</h4>
+                <p>All products are subject to availability. We reserve the right to refuse any order you place with us. All sales are final. As a Texas Cottage Food operation, all food products are made in a home kitchen and are not inspected by the Department of State Health Services or a local health department.</p>
+
+                <h4>3. Payments</h4>
+                <p>All payments are processed securely through Stripe. By providing payment information, you represent and warrant that the information is accurate, that you are authorized to use the payment method provided, and that you authorize us to charge your payment method for the total amount of your order.</p>
+
+                <h4>4. Intellectual Property</h4>
+                <p>The Service and its original content, features, and functionality are and will remain the exclusive property of Flour Shoppe Studios, LLC. Our trademarks may not be used in connection with any product or service without the prior written consent of Flour Shoppe Studios, LLC.</p>
+
+                <h4>5. Limitation of Liability</h4>
+                <p>In no event shall Flour Shoppe Studios, LLC, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from your access to or use of or inability to access or use the Service.</p>
+
+                <h4>6. Governing Law</h4>
+                <p>These Terms shall be governed and construed in accordance with the laws of the State of Texas, United States, without regard to its conflict of law provisions.</p>
+                <p><strong>Contact Us:</strong> If you have any questions about these Terms, please contact us at contact@thegildedspoonshoppe.com.</p>
+            </div>
+        </div>
+    </div>
+
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // This is a placeholder for your Stripe Publishable Key.
+            // In a real Netlify deployment, this would be replaced by the build process.
+            // For local testing, you can manually replace it with your test key.
+            const STRIPE_PUBLISHABLE_KEY = 'YOUR_STRIPE_PUBLISHABLE_KEY';
+            const stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
+
             // Cart state
             let cart = [];
 
             // DOM Elements
             const cartIcon = document.getElementById('cart-icon');
             const cartModal = document.getElementById('cart-modal');
-            const closeModalBtn = document.getElementById('close-cart-btn');
             const cartItemsContainer = document.getElementById('cart-items-container');
             const cartItemCount = document.getElementById('cart-item-count');
             const cartEmptyMsg = document.getElementById('cart-empty-msg');
             const cartFooter = document.getElementById('cart-footer');
             const cartSubtotalEl = document.getElementById('cart-subtotal');
             const discountLineEl = document.getElementById('discount-line');
-            
             const checkoutBtn = document.getElementById('checkout-btn');
-            const checkoutFormContainer = document.getElementById('checkout-form-container');
-            const checkoutErrorMsg = document.getElementById('checkout-error-msg');
-            const backToCartBtn = document.getElementById('back-to-cart-btn');
-            const confirmOrderBtn = document.getElementById('confirm-order-btn');
-            const orderConfirmation = document.getElementById('order-confirmation');
+            const paymentStatusMessage = document.getElementById('payment-status-message');
+
 
             // --- Event Listeners ---
             
-            // Open cart modal
-            cartIcon.addEventListener('click', () => cartModal.classList.add('is-open'));
+            cartIcon.addEventListener('click', () => document.getElementById('cart-modal').classList.add('is-open'));
 
-            // Close cart modal
-            closeModalBtn.addEventListener('click', () => cartModal.classList.remove('is-open'));
-            
-            // Close cart modal on overlay click
-            cartModal.addEventListener('click', (e) => {
-                if (e.target === cartModal) {
-                    cartModal.classList.remove('is-open');
-                }
-            });
-
-            // Event delegation for dynamic buttons
             document.body.addEventListener('click', (e) => {
+                // Open legal modals
+                if (e.target.dataset.modalTarget) {
+                    const modalId = e.target.dataset.modalTarget;
+                    document.getElementById(modalId).classList.add('is-open');
+                }
+
+                // Close any open modal
+                if (e.target.classList.contains('close-modal-btn') || e.target.classList.contains('modal-overlay')) {
+                     e.target.closest('.modal-overlay').classList.remove('is-open');
+                }
+
                 // Add to cart buttons
                 if (e.target.classList.contains('add-to-cart-btn')) {
                     const button = e.target;
@@ -501,18 +565,15 @@
                     const price = parseFloat(button.dataset.price);
                     let productToAdd = { name, price };
 
-                    // Check if there are options to select
                     if (card) {
                         const select = card.querySelector('.product-option-select');
                         if (select) {
                             const option = select.value;
                             if (!option) {
-                                // User hasn't selected an option, show an error state
                                 select.classList.add('border-red-500', 'border-2');
                                 select.focus();
-                                return; // Stop the function
+                                return;
                             }
-                            // If an option is selected, create a unique name
                             productToAdd.name = `${name} - ${option}`;
                             select.classList.remove('border-red-500', 'border-2');
                         }
@@ -520,7 +581,7 @@
                     addToCart(productToAdd);
                 }
 
-                // Handle clicks inside the cart items container (for quantity changes, remove)
+                // Handle clicks inside the cart items container
                 if (e.target.closest('#cart-items-container')) {
                     if (e.target.classList.contains('remove-item-btn')) {
                         removeFromCart(e.target.dataset.name);
@@ -537,53 +598,50 @@
                     mobileMenu.classList.toggle('hidden');
                 }
                 
-                // Close mobile menu when a link is clicked
                 if (mobileMenu.contains(e.target) && e.target.tagName === 'A') {
                     mobileMenu.classList.add('hidden');
                 }
             });
 
-            // --- NEW: Image Preview Listener ---
             document.querySelectorAll('.product-option-select').forEach(select => {
                 select.addEventListener('change', (e) => {
                     const selectedCard = e.target.closest('.product-card');
                     const previewImage = selectedCard.querySelector('.product-preview-image');
                     const selectedOption = e.target.options[e.target.selectedIndex];
                     const newImageSrc = selectedOption.dataset.imageSrc;
-
                     if (newImageSrc) {
                         previewImage.src = newImageSrc;
                     }
                 });
             });
 
+            // --- Stripe Checkout Listener ---
+            checkoutBtn.addEventListener('click', async () => {
+                checkoutBtn.textContent = 'Processing...';
+                checkoutBtn.disabled = true;
 
-            // --- Checkout Flow Listeners ---
-            checkoutBtn.addEventListener('click', () => {
-                cartItemsContainer.classList.add('hidden');
-                cartFooter.classList.add('hidden');
-                checkoutFormContainer.classList.remove('hidden');
-                orderConfirmation.classList.add('hidden');
-            });
+                try {
+                    const response = await fetch('/.netlify/functions/create-checkout', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ cart }),
+                    });
 
-            backToCartBtn.addEventListener('click', () => {
-                checkoutFormContainer.classList.add('hidden');
-                cartItemsContainer.classList.remove('hidden');
-                renderCartFooter(); // Re-show footer
-            });
-            
-            confirmOrderBtn.addEventListener('click', () => {
-                const name = document.getElementById('checkout-name').value;
-                const email = document.getElementById('checkout-email').value;
-                if (!name || !email) {
-                    checkoutErrorMsg.classList.remove('hidden');
-                    return;
+                    if (!response.ok) throw new Error('Server error');
+
+                    const { id } = await response.json();
+                    const { error } = await stripe.redirectToCheckout({ sessionId: id });
+
+                    if (error) {
+                        alert(error.message);
+                    }
+                } catch (error) {
+                    console.error('Checkout error:', error);
+                    alert('Failed to proceed to checkout. Please try again.');
+                } finally {
+                    checkoutBtn.textContent = 'Proceed to Checkout';
+                    checkoutBtn.disabled = false;
                 }
-                checkoutErrorMsg.classList.add('hidden');
-                checkoutFormContainer.classList.add('hidden');
-                orderConfirmation.classList.remove('hidden');
-                cart = []; // Clear cart after "purchase"
-                updateCart();
             });
 
 
@@ -618,22 +676,15 @@
             function calculateSubtotal() {
                 let subtotal = 0;
                 let originalTotal = 0;
-
-                // Separate kits and other items
                 const kits = cart.filter(item => item.name.includes('Kit'));
                 const otherItems = cart.filter(item => !item.name.includes('Kit'));
-
-                // Calculate kit subtotal and apply discount if applicable
                 let kitCount = kits.reduce((sum, item) => sum + item.quantity, 0);
                 let kitSubtotal = kits.reduce((sum, item) => sum + item.price * item.quantity, 0);
                 originalTotal += kitSubtotal;
-                
                 if (kitCount >= 2) {
-                    kitSubtotal *= 0.85; // Apply 15% discount
+                    kitSubtotal *= 0.85;
                 }
                 subtotal += kitSubtotal;
-
-                // Calculate subtotal for other items, checking for pucks
                 otherItems.forEach(item => {
                     originalTotal += item.price * item.quantity;
                     if (item.name === 'Cake Puck') {
@@ -645,7 +696,6 @@
                         subtotal += item.price * item.quantity;
                     }
                 });
-                
                 const discount = originalTotal - subtotal;
                 return { subtotal, discount };
             }
@@ -657,9 +707,7 @@
             }
 
             function renderCartItems() {
-                // FIX: Clear the container first to prevent duplicating items.
                 cartItemsContainer.innerHTML = '';
-
                 if (cart.length === 0) {
                     cartEmptyMsg.classList.remove('hidden');
                     cartItemsContainer.appendChild(cartEmptyMsg);
@@ -686,14 +734,12 @@
                 if (cart.length > 0) {
                     const { subtotal, discount } = calculateSubtotal();
                     cartSubtotalEl.textContent = `$${subtotal.toFixed(2)}`;
-                    
                     if (discount > 0) {
                         discountLineEl.textContent = `Specials applied: -$${discount.toFixed(2)}`;
                         discountLineEl.classList.remove('hidden');
                     } else {
                         discountLineEl.classList.add('hidden');
                     }
-                    
                     cartFooter.classList.remove('hidden');
                 } else {
                     cartFooter.classList.add('hidden');
@@ -709,6 +755,32 @@
                     cartItemCount.classList.add('hidden');
                 }
             }
+            
+            // --- Handle Post-Payment Redirect ---
+            function checkPaymentStatus() {
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.has('success')) {
+                    paymentStatusMessage.innerHTML = `
+                        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg relative" role="alert">
+                            <strong class="font-bold">Payment Successful!</strong>
+                            <span class="block sm:inline"> Thank you for your order. We will contact you shortly to arrange pickup/delivery.</span>
+                        </div>
+                    `;
+                    paymentStatusMessage.classList.remove('hidden');
+                    cart = []; // Clear the cart
+                    updateCart();
+                }
+                if (urlParams.has('canceled')) {
+                    paymentStatusMessage.innerHTML = `
+                        <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded-lg relative" role="alert">
+                            <strong class="font-bold">Order Canceled.</strong>
+                            <span class="block sm:inline"> Your order was not processed. You can continue shopping or try again.</span>
+                        </div>
+                    `;
+                    paymentStatusMessage.classList.remove('hidden');
+                }
+            }
+            checkPaymentStatus();
 
             // --- Smooth Scroll for anchor links ---
             document.querySelectorAll('a[href^="#"]').forEach(anchor => {
