@@ -258,28 +258,61 @@
                 <p class="text-lg text-center text-gray-600 mb-12 max-w-2xl mx-auto">A curated collection of charming goods for the creative soul and cake lover alike.</p>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                     <!-- T-Shirts -->
-                    <div class="bg-white p-8 rounded-xl shadow-lg text-center flex flex-col">
-                        <img src="https://i.imgur.com/caVd3zG.jpeg" alt="A branded t-shirt" class="w-full h-48 object-cover rounded-lg mb-6">
+                    <div class="bg-white p-8 rounded-xl shadow-lg text-center flex flex-col product-card">
+                        <img src="https://i.imgur.com/caVd3zG.jpeg" alt="A branded t-shirt" class="w-full h-48 object-cover rounded-lg mb-6 product-preview-image" data-default-src="https://i.imgur.com/caVd3zG.jpeg">
                         <h3 class="text-2xl font-serif font-semibold mb-2">Branded T-Shirts</h3>
                         <p class="text-accent font-bold text-xl mb-4">$25</p>
                         <p class="text-gray-600 mb-6 flex-grow">High-quality, soft cotton t-shirts featuring our logo or a fun, cake-themed design. Show your support in style!</p>
-                         <button class="inline-block px-8 py-3 text-center font-semibold rounded-lg transition-transform duration-300 ease-in-out bg-transparent border-2 border-accent text-accent hover:bg-accent hover:text-white mt-auto add-to-cart-btn" data-name="Branded T-Shirt" data-price="25.00">Add to Cart</button>
+                        <div class="mt-auto">
+                            <select class="w-full p-3 bg-white rounded-lg border border-stone-300 focus:outline-none focus:ring-2 focus:ring-accent/50 transition-shadow mb-4 product-option-select">
+                                <option value="" data-image-src="https://i.imgur.com/caVd3zG.jpeg">Select a Design...</option>
+                                <option value="My therapist is The Gilded Spoon." data-image-src="https://placehold.co/400x300/FDF8F5/4A3F35?text=My+therapist+is%0AThe+Gilded+Spoon">My therapist is The Gilded Spoon.</option>
+                                <option value="Born with a Gilded Spoon in my mouth." data-image-src="https://placehold.co/400x300/FDF8F5/4A3F35?text=Born+with+a%0AGilded+Spoon...">Born with a Gilded Spoon...</option>
+                                <option value="I'm just here for the gilded carbs." data-image-src="https://placehold.co/400x300/FDF8F5/4A3F35?text=I'm+just+here+for%0Athe+gilded+carbs">I'm just here for the gilded carbs.</option>
+                                <option value="Stressed, blessed, and Gilded Spoon obsessed." data-image-src="https://placehold.co/400x300/FDF8F5/4A3F35?text=Stressed,+blessed,%0Aand+obsessed.">Stressed, blessed, and obsessed.</option>
+                                <option value="Life is short. Use the gilded spoon." data-image-src="https://placehold.co/400x300/FDF8F5/4A3F35?text=Life+is+short.%0AUse+the+gilded+spoon.">Life is short. Use the gilded spoon.</option>
+                                <option value="This body was built on... gilded pastries." data-image-src="https://placehold.co/400x300/FDF8F5/4A3F35?text=This+body+was+built%0Aon+gilded+pastries.">This body was built on pastries.</option>
+                                <option value="Bake your own gold." data-image-src="https://placehold.co/400x300/FDF8F5/4A3F35?text=Bake+your+own+gold.">Bake your own gold.</option>
+                                <option value="Where every spoonful is golden." data-image-src="https://placehold.co/400x300/FDF8F5/4A3F35?text=Where+every%0Aspoonful+is+golden.">Where every spoonful is golden.</option>
+                                <option value="Find the gold in every day." data-image-src="https://placehold.co/400x300/FDF8F5/4A3F35?text=Find+the+gold%0Ain+every+day.">Find the gold in every day.</option>
+                                <option value="Elevating the Everyday." data-image-src="https://placehold.co/400x300/FDF8F5/4A3F35?text=Elevating+the+Everyday.">Elevating the Everyday.</option>
+                                <option value="Golden moments, baked daily." data-image-src="https://placehold.co/400x300/FDF8F5/4A3F35?text=Golden+moments,%0Abaked+daily.">Golden moments, baked daily.</option>
+                                <option value="Handcrafted with a golden touch." data-image-src="https://placehold.co/400x300/FDF8F5/4A3F35?text=Handcrafted+with%0Aa+golden+touch.">Handcrafted with a golden touch.</option>
+                            </select>
+                            <button class="inline-block px-8 py-3 text-center font-semibold rounded-lg transition-transform duration-300 ease-in-out bg-transparent border-2 border-accent text-accent hover:bg-accent hover:text-white w-full add-to-cart-btn" data-name="Branded T-Shirt" data-price="25.00">Add to Cart</button>
+                        </div>
                     </div>
                     <!-- Artisan Postcards -->
-                    <div class="bg-white p-8 rounded-xl shadow-lg text-center flex flex-col">
-                        <img src="https://i.imgur.com/Eqv14kk.jpeg" alt="A set of artisan postcards" class="w-full h-48 object-cover rounded-lg mb-6">
+                    <div class="bg-white p-8 rounded-xl shadow-lg text-center flex flex-col product-card">
+                        <img src="https://i.imgur.com/Eqv14kk.jpeg" alt="A set of artisan postcards" class="w-full h-48 object-cover rounded-lg mb-6 product-preview-image" data-default-src="https://i.imgur.com/Eqv14kk.jpeg">
                         <h3 class="text-2xl font-serif font-semibold mb-2">Artisan Postcards (Set of 3)</h3>
                         <p class="text-accent font-bold text-xl mb-4">$10</p>
                         <p class="text-gray-600 mb-6 flex-grow">Beautifully designed postcards with illustrations of our most popular cakes and charming bakery artwork.</p>
-                         <button class="inline-block px-8 py-3 text-center font-semibold rounded-lg transition-transform duration-300 ease-in-out bg-transparent border-2 border-accent text-accent hover:bg-accent hover:text-white mt-auto add-to-cart-btn" data-name="Artisan Postcard Set" data-price="10.00">Add to Cart</button>
+                        <div class="mt-auto">
+                            <select class="w-full p-3 bg-white rounded-lg border border-stone-300 focus:outline-none focus:ring-2 focus:ring-accent/50 transition-shadow mb-4 product-option-select">
+                                <option value="" data-image-src="https://i.imgur.com/Eqv14kk.jpeg">Select a Design Set...</option>
+                                <option value="Signature Cakes" data-image-src="https://placehold.co/400x300/FDF8F5/4A3F35?text=Signature+Cakes+Set">Signature Cakes Set</option>
+                                <option value="Whimsical Wonderland" data-image-src="https://placehold.co/400x300/FDF8F5/4A3F35?text=Whimsical+Wonderland">Whimsical Wonderland Set</option>
+                                <option value="Literary Creations" data-image-src="https://placehold.co/400x300/FDF8F5/4A3F35?text=Literary+Creations">Literary Creations Set</option>
+                            </select>
+                            <button class="inline-block px-8 py-3 text-center font-semibold rounded-lg transition-transform duration-300 ease-in-out bg-transparent border-2 border-accent text-accent hover:bg-accent hover:text-white w-full add-to-cart-btn" data-name="Artisan Postcard Set" data-price="10.00">Add to Cart</button>
+                        </div>
                     </div>
                     <!-- Custom-Cover Journals -->
-                    <div class="bg-white p-8 rounded-xl shadow-lg text-center flex flex-col">
-                        <img src="https://i.imgur.com/kaiBhye.jpeg" alt="A journal with a custom cover" class="w-full h-48 object-cover rounded-lg mb-6">
+                    <div class="bg-white p-8 rounded-xl shadow-lg text-center flex flex-col product-card">
+                        <img src="https://i.imgur.com/kaiBhye.jpeg" alt="A journal with a custom cover" class="w-full h-48 object-cover rounded-lg mb-6 product-preview-image" data-default-src="https://i.imgur.com/kaiBhye.jpeg">
                         <h3 class="text-2xl font-serif font-semibold mb-2">Custom-Cover Journals</h3>
                         <p class="text-accent font-bold text-xl mb-4">$18</p>
                         <p class="text-gray-600 mb-6 flex-grow">Lined journals with unique, literary-inspired cover art that complements our creative, whimsical spirit.</p>
-                         <button class="inline-block px-8 py-3 text-center font-semibold rounded-lg transition-transform duration-300 ease-in-out bg-transparent border-2 border-accent text-accent hover:bg-accent hover:text-white mt-auto add-to-cart-btn" data-name="Custom-Cover Journal" data-price="18.00">Add to Cart</button>
+                        <div class="mt-auto">
+                            <select class="w-full p-3 bg-white rounded-lg border border-stone-300 focus:outline-none focus:ring-2 focus:ring-accent/50 transition-shadow mb-4 product-option-select">
+                                <option value="" data-image-src="https://i.imgur.com/kaiBhye.jpeg">Select a Cover Design...</option>
+                                <option value="Golden Fern" data-image-src="https://placehold.co/400x300/FDF8F5/4A3F35?text=Golden+Fern">Golden Fern</option>
+                                <option value="Literary Blooms" data-image-src="https://placehold.co/400x300/FDF8F5/4A3F35?text=Literary+Blooms">Literary Blooms</option>
+                                <option value="Constellation Cake" data-image-src="https://placehold.co/400x300/FDF8F5/4A3F35?text=Constellation+Cake">Constellation Cake</option>
+                            </select>
+                            <button class="inline-block px-8 py-3 text-center font-semibold rounded-lg transition-transform duration-300 ease-in-out bg-transparent border-2 border-accent text-accent hover:bg-accent hover:text-white w-full add-to-cart-btn" data-name="Custom-Cover Journal" data-price="18.00">Add to Cart</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -462,9 +495,29 @@
             document.body.addEventListener('click', (e) => {
                 // Add to cart buttons
                 if (e.target.classList.contains('add-to-cart-btn')) {
-                    const name = e.target.dataset.name;
-                    const price = parseFloat(e.target.dataset.price);
-                    addToCart({ name, price });
+                    const button = e.target;
+                    const card = button.closest('.product-card');
+                    let name = button.dataset.name;
+                    const price = parseFloat(button.dataset.price);
+                    let productToAdd = { name, price };
+
+                    // Check if there are options to select
+                    if (card) {
+                        const select = card.querySelector('.product-option-select');
+                        if (select) {
+                            const option = select.value;
+                            if (!option) {
+                                // User hasn't selected an option, show an error state
+                                select.classList.add('border-red-500', 'border-2');
+                                select.focus();
+                                return; // Stop the function
+                            }
+                            // If an option is selected, create a unique name
+                            productToAdd.name = `${name} - ${option}`;
+                            select.classList.remove('border-red-500', 'border-2');
+                        }
+                    }
+                    addToCart(productToAdd);
                 }
 
                 // Handle clicks inside the cart items container (for quantity changes, remove)
@@ -489,6 +542,21 @@
                     mobileMenu.classList.add('hidden');
                 }
             });
+
+            // --- NEW: Image Preview Listener ---
+            document.querySelectorAll('.product-option-select').forEach(select => {
+                select.addEventListener('change', (e) => {
+                    const selectedCard = e.target.closest('.product-card');
+                    const previewImage = selectedCard.querySelector('.product-preview-image');
+                    const selectedOption = e.target.options[e.target.selectedIndex];
+                    const newImageSrc = selectedOption.dataset.imageSrc;
+
+                    if (newImageSrc) {
+                        previewImage.src = newImageSrc;
+                    }
+                });
+            });
+
 
             // --- Checkout Flow Listeners ---
             checkoutBtn.addEventListener('click', () => {
