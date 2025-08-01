@@ -2,7 +2,7 @@
 <html lang="en" class="scroll-smooth">
 <head>
     <script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="3b1782eb-dde3-48e2-a44e-a3f4666528a6" data-blockingmode="auto" type="text/javascript"></script>    
-  
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Gilded Spoon by Flour Shoppe Studios - Artisanal Cakes & Curiosities</title>
@@ -388,7 +388,7 @@
                 <h2 class="text-4xl md:text-5xl font-bold text-center mb-4 font-serif">Book an Experience or Request a Quote</h2>
                 <p class="text-lg text-center text-gray-600 mb-12 max-w-2xl mx-auto">We'd love to be a part of your celebration. Please fill out the form below, and we'll get back to you shortly to confirm details and availability.</p>
                 <div class="max-w-3xl mx-auto bg-white p-8 md:p-12 rounded-xl shadow-2xl">
-                    <form action="#" method="POST" onsubmit="return false;">
+                    <form id="booking-form" action="#" method="POST">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                             <div>
                                 <label for="name" class="block text-gray-700 font-semibold mb-2">Full Name</label>
@@ -555,13 +555,26 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Replace this with your actual Stripe Publishable Key
-            const stripe = Stripe('pk_live_51RY9AFISoT6TWkWBuwuI1u5lIGHlzLjFsyTVW9YVutgtJDUUukKgFcO2AwEQbtGI3chfZozxMQkRadB1uqxWYLjD00B3Zseoh4');
+            // --- Stripe Initialization ---
+            let stripe;
+            try {
+                // Replace this with your actual Stripe Publishable Key
+                stripe = Stripe('pk_live_51RY9AFISoT6TWkWBuwuI1u5lIGHlzLjFsyTVW9YVutgtJDUUukKgFcO2AwEQbtGI3chfZozxMQkRadB1uqxWYLjD00B3Zseoh4');
+            } catch (e) {
+                console.error("Stripe.js failed to load. Checkout will not be available.", e);
+                // Gracefully disable checkout functionality if Stripe doesn't load
+                const checkoutButton = document.getElementById('checkout-btn');
+                if(checkoutButton) {
+                    checkoutButton.disabled = true;
+                    checkoutButton.textContent = 'Checkout Unavailable';
+                    checkoutButton.style.backgroundColor = '#9ca3af'; // gray-400
+                }
+            }
 
-            // Cart state
+            // --- Cart State ---
             let cart = [];
 
-            // DOM Elements
+            // --- DOM Elements ---
             const cartIcon = document.getElementById('cart-icon');
             const paymentStatusMessage = document.getElementById('payment-status-message');
             const cartItemsContainer = document.getElementById('cart-items-container');
@@ -571,17 +584,34 @@
             const cartSubtotalEl = document.getElementById('cart-subtotal');
             const discountLineEl = document.getElementById('discount-line');
             const checkoutBtn = document.getElementById('checkout-btn');
+            const bookingForm = document.getElementById('booking-form');
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
 
-
-            // --- Event Listeners ---
+            // --- Event Listeners Setup ---
             
-            cartIcon.addEventListener('click', () => document.getElementById('cart-modal').classList.add('is-open'));
+            // Cart Icon Listener
+            if (cartIcon) {
+                cartIcon.addEventListener('click', () => {
+                    const cartModal = document.getElementById('cart-modal');
+                    if (cartModal) cartModal.classList.add('is-open');
+                });
+            }
 
+            // Mobile Menu Button Listener
+            if (mobileMenuButton && mobileMenu) {
+                mobileMenuButton.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('hidden');
+                });
+            }
+
+            // Delegated listener for dynamically created elements and modals
             document.body.addEventListener('click', (e) => {
                 // Open legal modals
                 if (e.target.dataset.modalTarget) {
                     const modalId = e.target.dataset.modalTarget;
-                    document.getElementById(modalId).classList.add('is-open');
+                    const modal = document.getElementById(modalId);
+                    if (modal) modal.classList.add('is-open');
                 }
 
                 // Close any open modal
@@ -593,7 +623,7 @@
                 // Add to cart buttons
                 if (e.target.classList.contains('add-to-cart-btn')) {
                     const button = e.target;
-                    const card = button.closest('.product-card, .flex-col'); // Works for both card types
+                    const card = button.closest('.product-card, .flex-col');
                     let name = button.dataset.name;
                     const price = parseFloat(button.dataset.price);
                     let productToAdd = { name, price };
@@ -614,8 +644,9 @@
                     addToCart(productToAdd);
                 }
 
-                // Handle clicks inside the cart items container
-                if (e.target.closest('#cart-items-container')) {
+                // Handle clicks inside the cart items container (for quantity changes/removals)
+                const cartContainer = e.target.closest('#cart-items-container');
+                if (cartContainer) {
                     if (e.target.classList.contains('remove-item-btn')) {
                         removeFromCart(e.target.dataset.name);
                     } else if (e.target.classList.contains('quantity-change')) {
@@ -624,59 +655,79 @@
                     }
                 }
                 
-                // Mobile Menu Toggle
-                const mobileMenuButton = document.getElementById('mobile-menu-button');
-                const mobileMenu = document.getElementById('mobile-menu');
-                if (mobileMenuButton.contains(e.target)) {
-                    mobileMenu.classList.toggle('hidden');
-                }
-                
-                if (mobileMenu.contains(e.target) && e.target.tagName === 'A') {
+                // Close mobile menu when a link inside it is clicked
+                if (mobileMenu && mobileMenu.contains(e.target) && e.target.tagName === 'A') {
                     mobileMenu.classList.add('hidden');
                 }
             });
 
+            // Product image preview listener
             document.querySelectorAll('.product-option-select').forEach(select => {
                 select.addEventListener('change', (e) => {
                     const selectedCard = e.target.closest('.product-card');
+                    if (!selectedCard) return;
                     const previewImage = selectedCard.querySelector('.product-preview-image');
                     const selectedOption = e.target.options[e.target.selectedIndex];
                     const newImageSrc = selectedOption.dataset.imageSrc;
-                    if (newImageSrc) {
+                    if (previewImage && newImageSrc) {
                         previewImage.src = newImageSrc;
                     }
                 });
             });
 
-            // --- Stripe Checkout Listener ---
-            checkoutBtn.addEventListener('click', async () => {
-                checkoutBtn.textContent = 'Processing...';
-                checkoutBtn.disabled = true;
+            // Booking Form Submission
+            if (bookingForm) {
+                bookingForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const formData = new FormData(bookingForm);
+                    const name = formData.get('name') || 'Valued Customer';
+                    const formContainer = bookingForm.parentElement;
 
-                try {
-                    const response = await fetch('/.netlify/functions/create-checkout', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ cart }),
-                    });
+                    formContainer.innerHTML = `
+                        <div class="text-center transition-opacity duration-500" style="opacity:0;" id="form-success-msg">
+                             <svg class="w-16 h-16 mx-auto mb-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <h3 class="text-3xl font-serif font-bold mb-3 text-accent">Thank You, ${name}!</h3>
+                            <p class="text-gray-600 leading-relaxed mb-6">Your inquiry has been sent successfully. We will review your request and get back to you at the email address you provided within 1-2 business days.</p>
+                            <p class="text-gray-500 text-sm">You can now close this window or continue browsing.</p>
+                        </div>
+                    `;
+                    setTimeout(() => {
+                        const successMsg = document.getElementById('form-success-msg');
+                        if(successMsg) successMsg.style.opacity = '1';
+                    }, 100);
+                });
+            }
 
-                    if (!response.ok) throw new Error('Server error');
-
-                    const { id } = await response.json();
-                    const { error } = await stripe.redirectToCheckout({ sessionId: id });
-
-                    if (error) {
-                        alert(error.message);
+            // Stripe Checkout Listener
+            if (checkoutBtn) {
+                checkoutBtn.addEventListener('click', async () => {
+                    if (!stripe) {
+                        alert('Payment processing is currently unavailable. Please try again later.');
+                        return;
                     }
-                } catch (error) {
-                    console.error('Checkout error:', error);
-                    alert('Failed to proceed to checkout. Please try again.');
-                } finally {
-                    checkoutBtn.textContent = 'Proceed to Checkout';
-                    checkoutBtn.disabled = false;
-                }
-            });
+                    checkoutBtn.textContent = 'Processing...';
+                    checkoutBtn.disabled = true;
 
+                    try {
+                        alert('This is a demo. The checkout process requires a backend server to securely create a Stripe session. This functionality is not implemented in this static example.');
+                        // In a real application, you would fetch a session ID from your server:
+                        // const response = await fetch('/api/create-checkout-session', {
+                        //     method: 'POST',
+                        //     headers: { 'Content-Type': 'application/json' },
+                        //     body: JSON.stringify({ cart }),
+                        // });
+                        // const { id } = await response.json();
+                        // const { error } = await stripe.redirectToCheckout({ sessionId: id });
+                        // if (error) { alert(error.message); }
+                    } catch (error) {
+                        console.error('Checkout error:', error);
+                        alert('Failed to proceed to checkout. Please see the console for more information.');
+                    } finally {
+                        checkoutBtn.textContent = 'Proceed to Checkout';
+                        checkoutBtn.disabled = false;
+                    }
+                });
+            }
 
             // --- Cart Functions ---
             function addToCart(product) {
@@ -715,18 +766,20 @@
                 let kitSubtotal = kits.reduce((sum, item) => sum + item.price * item.quantity, 0);
                 originalTotal += kitSubtotal;
                 if (kitCount >= 2) {
-                    kitSubtotal *= 0.85;
+                    kitSubtotal *= 0.85; // Apply 15% discount
                 }
                 subtotal += kitSubtotal;
                 otherItems.forEach(item => {
-                    originalTotal += item.price * item.quantity;
+                    let itemPrice = item.price;
+                    let itemQuantity = item.quantity;
+                    originalTotal += itemPrice * itemQuantity;
+
                     if (item.name.startsWith('Cake Puck')) {
-                        const pucks = item.quantity;
-                        const bundlesOfThree = Math.floor(pucks / 3);
-                        const remainingPucks = pucks % 3;
+                        const bundlesOfThree = Math.floor(itemQuantity / 3);
+                        const remainingPucks = itemQuantity % 3;
                         subtotal += (bundlesOfThree * 10) + (remainingPucks * 4);
                     } else {
-                        subtotal += item.price * item.quantity;
+                        subtotal += itemPrice * itemQuantity;
                     }
                 });
                 const discount = originalTotal - subtotal;
@@ -740,10 +793,11 @@
             }
 
             function renderCartItems() {
+                if (!cartItemsContainer || !cartEmptyMsg) return;
                 cartItemsContainer.innerHTML = '';
                 if (cart.length === 0) {
                     cartEmptyMsg.classList.remove('hidden');
-                    cartItemsContainer.appendChild(cartEmptyMsg);
+                    // cartItemsContainer.appendChild(cartEmptyMsg); // cartEmptyMsg is already inside
                 } else {
                     cartEmptyMsg.classList.add('hidden');
                     cartItemsContainer.innerHTML = cart.map(item => `
@@ -764,6 +818,7 @@
             }
             
             function renderCartFooter() {
+                if (!cartFooter || !cartSubtotalEl || !discountLineEl) return;
                 if (cart.length > 0) {
                     const { subtotal, discount } = calculateSubtotal();
                     cartSubtotalEl.textContent = `$${subtotal.toFixed(2)}`;
@@ -780,6 +835,7 @@
             }
 
             function updateCartIcon() {
+                if (!cartItemCount) return;
                 const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
                 if (totalItems > 0) {
                     cartItemCount.textContent = totalItems;
@@ -789,8 +845,8 @@
                 }
             }
             
-            // --- Handle Post-Payment Redirect ---
             function checkPaymentStatus() {
+                if (!paymentStatusMessage) return;
                 const urlParams = new URLSearchParams(window.location.search);
                 if (urlParams.has('success')) {
                     paymentStatusMessage.innerHTML = `
@@ -813,20 +869,28 @@
                     paymentStatusMessage.classList.remove('hidden');
                 }
             }
-            checkPaymentStatus();
-
-            // --- Smooth Scroll for anchor links ---
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    const href = this.getAttribute('href');
-                    if (href.length > 1) {
-                        e.preventDefault();
-                        document.querySelector(href).scrollIntoView({
-                            behavior: 'smooth'
-                        });
-                    }
+            
+            function smoothScroll() {
+                document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                    anchor.addEventListener('click', function (e) {
+                        const href = this.getAttribute('href');
+                        if (href && href.length > 1) {
+                            e.preventDefault();
+                            const targetElement = document.querySelector(href);
+                            if (targetElement) {
+                               targetElement.scrollIntoView({
+                                    behavior: 'smooth'
+                               });
+                            }
+                        }
+                    });
                 });
-            });
+            }
+
+            // --- Initial Page Load Calls ---
+            checkPaymentStatus();
+            smoothScroll();
+            updateCart(); // Initial call to set cart state
         });
     </script>
 </body>
